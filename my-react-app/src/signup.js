@@ -32,7 +32,7 @@ const Signup = () => {
     <>
     <div className='main_container_signup'>
       <div className='header'>
-        <h2>signup</h2>
+        <h2>Signup</h2>
       </div>
       <div className='box'>
         <input type='text' value={name} placeholder='Username' onChange={(e) => setName(e.target.value)}></input>
@@ -45,7 +45,7 @@ const Signup = () => {
       </div>
       <p>Already have an Account <Link to="/">Login Now</Link></p>
       
-      <button onClick={submit}>SignUp</button>
+      <button onClick={submit}>Signup</button>
     </div>
     </>
   )
