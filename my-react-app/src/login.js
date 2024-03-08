@@ -20,7 +20,7 @@ const Login = () => {
           {
             
               alert("Login successfully")
-              navigate("/Homepage");
+              navigate("/FileManagement");
           }
       } 
       catch (error)

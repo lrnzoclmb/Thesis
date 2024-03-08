@@ -75,6 +75,11 @@ body
     outline: none;
     background: #C6CF9B;
     border-radius: 5px;
-    color: #F6ECA9;
+    color: #596FB7;
     font-weight: 600;
+}
+
+.main_container_signup p Link
+{
+    text-decoration: none;
 }

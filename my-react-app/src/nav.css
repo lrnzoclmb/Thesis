@@ -1,0 +1,29 @@
+nav {
+    background-color: #C6CF9B;
+    padding: 15px;
+  }
+  
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+  }
+  
+  nav li .tab {
+    margin-right: 20px;
+    margin-left: auto;
+    text-align: center;
+    text-decoration: none;
+    color: #596FB7;
+    outline: none;
+    font-size: 18px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  
+  nav li .tab:hover {
+    color: black;
+  }
+  

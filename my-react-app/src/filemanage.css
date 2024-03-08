@@ -1,0 +1,61 @@
+.file-management {
+    background-color: #596FB7;
+    padding: 20px 30px;
+    margin: 0px auto;
+    width: 400px;
+    margin-top: 100px;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  .color-mode,
+  .paper-size {
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  .qr-code {
+    margin-top: 20px;
+  }
+
+  .file-management button 
+  {
+    margin-top: 10px;
+    margin-left: 35%;
+    padding: 10px 30px;
+    border: none;
+    outline: none;
+    background: #C6CF9B;
+    border-radius: 5px;
+    color: #596FB7;
+    font-weight: 600;
+  }
+
+  .color-mode h3 
+  {
+    text-align: center;
+    color: #F6ECA9;
+    font-size: 18px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  .paper-size h3 
+  {
+    text-align: center;
+    color: #F6ECA9;
+    font-size: 18px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-top: 10px;
+  }
+
+  .paper-size input
+  {
+    margin-right: 10px;
+  }
+
+
