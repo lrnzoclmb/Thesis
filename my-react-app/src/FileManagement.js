@@ -1,25 +1,26 @@
-import { useState } from "react";
-import { storage, db } from './firebase';
-import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { ref as dbRef, push, get } from "firebase/database";
-import { v4 } from "uuid";
+import { useState } from 'react';
+import { storage, db, auth } from './firebase';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref as dbRef, push } from 'firebase/database';
+import { v4 } from 'uuid';
 import QRCode from 'react-qr-code';
-import NavBar from './NavBar'
-import './filemanage.css'
-
+import NavBar from './NavBar';
+import './filemanage.css';
 
 function FileManagement() {
   const [fileUpload, setFileUpload] = useState(null);
-  const [color, setColor] = useState("");
-  const [size, setSize] = useState("");
+  const [color, setColor] = useState('');
+  const [size, setSize] = useState('');
+  const [payment, setPayment] = useState('');
   const [qrCodeData, setQRCodeData] = useState(null);
+  const user = auth.currentUser; // Get the currently authenticated user
 
   const isPDF = (file) => {
     return file.type === "application/pdf";
   };
 
-  const generateQRCodeData = (fileData) => {
-    return JSON.stringify(fileData);
+  const generateQRCodeData = (fileID) => {
+    return JSON.stringify(fileID);
   };
 
   const uploadFile = () => {
@@ -41,12 +42,14 @@ function FileManagement() {
           timestamp: Date.now(),
           colortype: color,
           papersize: size,
+          paymenttype: payment,
+          userID: user ? user.uid : null, // Add the user ID if available
         };
 
         push(tempDatabaseRef, fileData).then((newRef) => {
           const newID = newRef.key;
           const qrCodeData = generateQRCodeData(newID);
-            setQRCodeData(qrCodeData);
+          setQRCodeData(qrCodeData);
 
         }).catch((error) => {
           console.error("Error pushing data to database:", error);
@@ -62,13 +65,33 @@ function FileManagement() {
     <>
     <NavBar />
     <div className="file-management">
-        <input
+        <input 
           type="file"
           accept=".pdf"
+          id="upload"
           onChange={(event) => {
             setFileUpload(event.target.files[0]);
           }}
         />
+        <div className="payment-method">
+          <h3>Payment Methods: </h3>
+          <input
+            type="radio"
+            name="payments"
+            value="TapID"
+            id="TapId"
+            onChange={() => setPayment('TapID')}
+          />
+          <label htmlFor="long">Tap ID</label>
+          <input
+            type="radio"
+            name="payments"
+            value="Coin"
+            id="insert"
+            onChange={() => setPayment('Coin')}
+          />
+          <label htmlFor="short">Insert Coin</label>
+        </div>
         <div className="color-mode">
           <h3>Color Mode: </h3>
           <input
@@ -107,6 +130,7 @@ function FileManagement() {
           />
           <label htmlFor="short">Short</label>
         </div>
+        
         <button onClick={uploadFile}>Generate Ticket</button>
         {qrCodeData && (
           <div className="qr-code">

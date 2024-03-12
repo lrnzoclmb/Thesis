@@ -1,9 +1,10 @@
 //import { initializeApp } from "firebase/app";
-import firebase from 'firebase/compat/app'
+import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
-import 'firebase/compat/database'
-import { getStorage } from "firebase/storage";
-import { getDatabase } from "firebase/database";
+import 'firebase/compat/database';
+import { getStorage } from 'firebase/storage';
+import { getDatabase } from 'firebase/database';
+import { getAuth } from 'firebase/auth';
 
 
 const firebaseConfig = {
@@ -17,6 +18,19 @@ const firebaseConfig = {
 };
 
 const app = firebase.initializeApp(firebaseConfig);
-export default app
+
+// Enable session persistence
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+  .then(() => {
+    console.log('Session persistence enabled');
+  })
+  .catch((error) => {
+    console.error('Error enabling session persistence:', error);
+  });
+
+const auth = getAuth(app); // Get the authentication object
+
+export default app;
 export const storage = getStorage(app);
 export const db = getDatabase(app);
+export { auth }; // Export the auth object for authentication
