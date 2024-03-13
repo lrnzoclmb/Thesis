@@ -4,6 +4,7 @@ import Signup from './signup';
 import Login from './login';
 import Homepage from './Homepage';
 import FileManagement from './FileManagement';
+import Account from './Account';
 
 const Rout = () => {
   const [userProfile, setUserProfile] = useState(null);
@@ -21,6 +22,7 @@ const Rout = () => {
         path="/FileManagement"
         element={<FileManagement userProfile={userProfile} />}
       />
+      <Route path="/Account" element={<Account userProfile={userProfile} />} />
     </Routes>
   );
 };

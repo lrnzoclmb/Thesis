@@ -29,7 +29,7 @@
   outline: none;
   background: #C6CF9B;
   border-radius: 5px;
-  color: #596FB7;
+  color: #11235A;
   font-weight: 600;
 }
 
@@ -95,6 +95,6 @@
 }
 
 .color-mode input[type="radio"] {
-  margin-left: 10px; /* Adjust this value to increase or decrease the space between radio input and label */
+  margin-left: 10px; 
 }
 
