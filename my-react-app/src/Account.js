@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/database'; 
+import NavBar from './NavBar';
 
 function Account() {
   const [userData, setUserData] = useState(null);
@@ -30,6 +31,8 @@ function Account() {
   }, []);
 
   return (
+    <>
+    <NavBar />
     <div>
       <h1>Account Page</h1>
       {loading && <p>Loading...</p>}
@@ -41,6 +44,7 @@ function Account() {
         </div>
       )}
     </div>
+    </>
   );
 }
 

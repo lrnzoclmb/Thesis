@@ -5,6 +5,7 @@ import Login from './login';
 import Homepage from './Homepage';
 import FileManagement from './FileManagement';
 import Account from './Account';
+import Topup from './Topup';
 
 const Rout = () => {
   const [userProfile, setUserProfile] = useState(null);
@@ -18,10 +19,8 @@ const Rout = () => {
       <Route path="/" element={<Login onLogin={handleLogin} />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/Homepage" element={<Homepage />} />
-      <Route
-        path="/FileManagement"
-        element={<FileManagement userProfile={userProfile} />}
-      />
+      <Route path="/FileManagement" element={<FileManagement userProfile={userProfile} />}/>
+      <Route path="/Topup" element={<Topup userProfile={userProfile} />}/>
       <Route path="/Account" element={<Account userProfile={userProfile} />} />
     </Routes>
   );

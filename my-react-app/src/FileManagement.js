@@ -82,7 +82,7 @@ function FileManagement() {
             id="TapId"
             onChange={() => setPayment('TapID')}
           />
-          <label htmlFor="long">Tap ID</label>
+          <label htmlFor="TapId">Tap ID</label>
           <input
             type="radio"
             name="payments"
@@ -90,7 +90,7 @@ function FileManagement() {
             id="insert"
             onChange={() => setPayment('Coin')}
           />
-          <label htmlFor="short">Insert Coin</label>
+          <label htmlFor="insert">Insert Coin</label>
         </div>
         <div className="color-mode">
           <h3>Color Mode: </h3>

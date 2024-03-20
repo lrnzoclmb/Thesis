@@ -14,7 +14,7 @@ const NavBar = () => {
               <Link to="/FileManagement" className='tab'>File Uploading</Link>
             </li>
             <li>
-              <Link to="/contact" className='tab' >Top Up</Link>
+              <Link to="/Topup" className='tab' >Top Up</Link>
             </li>
             <li>
               <Link to="/Account" className='tab' >Account</Link>
