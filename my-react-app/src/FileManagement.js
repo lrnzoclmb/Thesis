@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { storage, db, auth } from './firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { ref as dbRef, push } from 'firebase/database';
 import { v4 } from 'uuid';
 import QRCode from 'react-qr-code';
 import NavBar from './NavBar';
+import { pdfjs } from 'react-pdf';
 import './filemanage.css';
+
+// This is important to set workerSrc url
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 function FileManagement() {
   const [fileUpload, setFileUpload] = useState(null);
@@ -13,7 +17,8 @@ function FileManagement() {
   const [size, setSize] = useState('');
   const [payment, setPayment] = useState('');
   const [qrCodeData, setQRCodeData] = useState(null);
-  const user = auth.currentUser; // Get the currently authenticated user
+  const [numPages, setNumPages] = useState(null); // State for storing total pages
+  const user = auth.currentUser;
 
   const isPDF = (file) => {
     return file.type === "application/pdf";
@@ -32,7 +37,7 @@ function FileManagement() {
     }
 
     const fileRef = storageRef(storage, `files/${v4()}`);
-    const tempDatabaseRef = dbRef(db, 'uploadedFiles');
+    const tempDatabaseRef = dbRef(db, 'transaction');
 
     uploadBytes(fileRef, fileUpload).then(() => {
       getDownloadURL(fileRef).then((downloadURL) => {
@@ -44,6 +49,7 @@ function FileManagement() {
           papersize: size,
           paymenttype: payment,
           userID: user ? user.uid : null, // Add the user ID if available
+          totalPages: numPages, // Add total pages here
         };
 
         push(tempDatabaseRef, fileData).then((newRef) => {
@@ -60,19 +66,36 @@ function FileManagement() {
     });
   };
 
+  const onFileChange = (event) => {
+    const uploadedFile = event.target.files[0];
+    setFileUpload(uploadedFile);
+    countPages(uploadedFile); // Call countPages when file is uploaded
+  };
+
+  const countPages = async (selectedFile) => {
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const buffer = reader.result;
+      const typedArray = new Uint8Array(buffer);
+      const pdf = await pdfjs.getDocument(typedArray).promise;
+      setNumPages(pdf.numPages); // Set the total pages in state
+    };
+    reader.readAsArrayBuffer(selectedFile);
+  };
 
   return (
     <>
-    <NavBar />
-    <div className="file-management">
+      <NavBar />
+      <div className="file-management">
         <input 
           type="file"
           accept=".pdf"
           id="upload"
-          onChange={(event) => {
-            setFileUpload(event.target.files[0]);
-          }}
+          onChange={onFileChange} // Call onFileChange when file is selected
         />
+        {numPages && ( // Display total pages if available
+          <p>Total Pages: {numPages}</p>
+        )}
         <div className="payment-method">
           <h3>Payment Methods: </h3>
           <input
@@ -144,4 +167,3 @@ function FileManagement() {
 }
 
 export default FileManagement;
-
