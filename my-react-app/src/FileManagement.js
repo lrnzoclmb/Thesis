@@ -17,7 +17,8 @@ function FileManagement() {
   const [size, setSize] = useState('');
   const [payment, setPayment] = useState('');
   const [qrCodeData, setQRCodeData] = useState(null);
-  const [numPages, setNumPages] = useState(null); // State for storing total pages
+  const [numPages, setNumPages] = useState(null);
+  const [status, setStatus] = useState('pending'); 
   const user = auth.currentUser;
 
   const isPDF = (file) => {
@@ -50,6 +51,7 @@ function FileManagement() {
           paymenttype: payment,
           userID: user ? user.uid : null, // Add the user ID if available
           totalPages: numPages, // Add total pages here
+          filestatus: status, // Include the status field with 'pending' value
         };
 
         push(tempDatabaseRef, fileData).then((newRef) => {
