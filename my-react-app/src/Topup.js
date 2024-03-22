@@ -6,7 +6,8 @@ import QRCode from 'react-qr-code'; // Import QRCode component
 
 function TopUp() {
   const [amount, setAmount] = useState('');
-  const [transaction] = useState('topup'); 
+  const [transaction] = useState('topup');
+  const [ status ] = useState('pending'); 
   const [qrCodeData, setQRCodeData] = useState(null); // State to store QR code data
   const user = auth.currentUser;
 
@@ -22,7 +23,8 @@ function TopUp() {
       userId: user ? user.uid : null,
       amount: amount,
       timestamp: Date.now(),
-      transactionType: transaction
+      transactionStatus: status,  
+      transactionType: transaction,
     };
 
     push(tempDatabaseRef, topUpData)

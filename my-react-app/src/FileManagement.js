@@ -52,7 +52,7 @@ function FileManagement() {
           paymenttype: payment,
           userID: user ? user.uid : null, 
           totalPages: numPages, 
-          filestatus: status, 
+          transactionStatus: status, 
           transactionType: transaction,
         };
 
