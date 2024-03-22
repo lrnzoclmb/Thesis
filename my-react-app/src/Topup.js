@@ -1,46 +1,49 @@
-import { useState, useEffect } from 'react';
-import { auth } from './firebase'; // Import Firebase Realtime Database and Auth modules
-import QRCode from 'react-qr-code';
+import React, { useState } from 'react';
+import { db, auth } from './firebase';
+import { ref as dbRef, push } from 'firebase/database';
 import NavBar from './NavBar';
-import './filemanage.css';
+import QRCode from 'react-qr-code'; // Import QRCode component
 
-const Topup = () => {
-  const [amount, setAmount] = useState(null); // State to store the selected amount
-  const [qrCodeData, setQrCodeData] = useState(null); // State to store the QR code data
-  const [currentUser, setCurrentUser] = useState(null); // State to store the current user
+function TopUp() {
+  const [amount, setAmount] = useState('');
+  const [transaction] = useState('topup'); 
+  const [qrCodeData, setQRCodeData] = useState(null); // State to store QR code data
+  const user = auth.currentUser;
 
-  // Function to fetch the current user on component mount
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setCurrentUser(user);
-      } else {
-        setCurrentUser(null);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  // Function to generate the QR code data
-  const generateQRCodeData = () => {
-    if (amount && currentUser) {
-      const data = {
-        userId: currentUser.uid,
-        amount: amount,
-        timestamp: Date.now(), // Include timestamp for uniqueness
-      };
-      const qrData = JSON.stringify(data);
-      setQrCodeData(qrData);
+  const handleTopUp = () => {
+    if (!amount) {
+      alert("Please select an amount to top up.");
+      return;
     }
+
+    const tempDatabaseRef = dbRef(db, 'transaction');
+
+    const topUpData = {
+      userId: user ? user.uid : null,
+      amount: amount,
+      timestamp: Date.now(),
+      transactionType: transaction
+    };
+
+    push(tempDatabaseRef, topUpData)
+      .then((newRef) => {
+        console.log("Top-up transaction added to database successfully!");
+        const refKey = newRef.key; // Get the reference key from the newly added transaction
+        setQRCodeData(refKey); // Set the refKey as QR code data
+      })
+      .catch((error) => {
+        console.error("Error adding top-up transaction to database:", error);
+      });
   };
 
   return (
     <>
       <NavBar />
       <div className="file-management">
-        <div className="paper-size">
-          <h3>Top Up</h3>
+      <div className="payment-method">
+        <h2>Top Up </h2>
+        <div className="amount-options">
+          <h3>Top Up Amount:</h3>
           <input
             type="radio"
             name="amount"
@@ -74,16 +77,17 @@ const Topup = () => {
           />
           <label htmlFor="hundred">₱100</label>
         </div>
-        <button onClick={generateQRCodeData}>Generate Ticket</button> {/* Call generateQRCodeData function */}
-        {qrCodeData && (
+        <button onClick={handleTopUp}>Top Up</button>
+        {qrCodeData && ( // Display QR code if data is available
           <div className="qr-code">
             <h3>QR Code:</h3>
-            <QRCode value={qrCodeData} />
+            <QRCode value={qrCodeData} /> {/* Generate QR code with the reference key */}
           </div>
         )}
       </div>
+      </div>
     </>
   );
-};
+}
 
-export default Topup;
+export default TopUp;
