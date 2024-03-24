@@ -29,7 +29,6 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
   });
 
 const auth = getAuth(app); // Get the authentication object
-
 export default app;
 export const storage = getStorage(app);
 export const db = getDatabase(app);
