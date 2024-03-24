@@ -9,6 +9,7 @@ const Signup = () => {
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [pass, setPass] = useState('')
+  const [ userbalance ] = useState('0');
   const navigate = useNavigate()
 
   const submit = async(e) =>
@@ -29,7 +30,8 @@ const Signup = () => {
               uid: user.uid,
               firstName: firstName,
               lastName: lastName,
-              email: email
+              email: email,
+              balance: userbalance,
           });
 
           alert("Account Created successfully")
