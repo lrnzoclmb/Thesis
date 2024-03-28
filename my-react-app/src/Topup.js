@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { db, auth } from './firebase';
 import { ref as dbRef, push } from 'firebase/database';
 import NavBar from './NavBar';
-import QRCode from 'react-qr-code'; // Import QRCode component
+import QRCode from 'react-qr-code'; 
 
 function TopUp() {
   const [amount, setAmount] = useState('');
   const [transaction] = useState('topup');
   const [ status ] = useState('pending'); 
-  const [qrCodeData, setQRCodeData] = useState(null); // State to store QR code data
+  const [qrCodeData, setQRCodeData] = useState(null); 
   const user = auth.currentUser;
 
   const handleTopUp = () => {
@@ -30,8 +30,8 @@ function TopUp() {
     push(tempDatabaseRef, topUpData)
       .then((newRef) => {
         console.log("Top-up transaction added to database successfully!");
-        const refKey = newRef.key; // Get the reference key from the newly added transaction
-        setQRCodeData(refKey); // Set the refKey as QR code data
+        const refKey = newRef.key; 
+        setQRCodeData(refKey); 
       })
       .catch((error) => {
         console.error("Error adding top-up transaction to database:", error);
