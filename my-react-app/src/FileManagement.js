@@ -107,6 +107,14 @@ function FileManagement() {
           <input
             type="radio"
             name="payments"
+            value="OnlinePayment"
+            id="TOnlinepayment"
+            onChange={() => setPayment('OnlinePayment')}
+          />
+          <label htmlFor="TapId">Online Payment</label>
+          <input
+            type="radio"
+            name="payments"
             value="Coin"
             id="insert"
             onChange={() => setPayment('Coin')}
