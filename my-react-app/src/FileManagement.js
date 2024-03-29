@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { storage, db, auth } from './firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { ref as dbRef, push } from 'firebase/database';
@@ -17,9 +17,27 @@ function FileManagement() {
   const [payment, setPayment] = useState('');
   const [qrCodeData, setQRCodeData] = useState(null);
   const [numPages, setNumPages] = useState(null);
-  const [ status ] = useState('pending');
-  const [ transaction ] = useState('printing'); 
+  const [status] = useState('pending');
+  const [transaction] = useState('printing');
+  const [totalPrice, setTotalPrice] = useState(0); // State variable to hold the total price
   const user = auth.currentUser;
+
+  // Prices for different options
+  const priceMap = {
+    Colored: 5,
+    BnW: 1,
+    Long: 2,
+    Short: 1
+  };
+
+  // Calculate total price based on selected options
+  useEffect(() => {
+    const colorPrice = priceMap[color] || 0;
+    const sizePrice = priceMap[size] || 0;
+    const totalPrice = (colorPrice + sizePrice) * (numPages || 0); // Multiply total price by total pages
+    setTotalPrice(totalPrice);
+  }, [color, size, numPages]); // Remove priceMap from the dependency array
+  
 
   const isPDF = (file) => {
     return file.type === "application/pdf";
@@ -45,16 +63,16 @@ function FileManagement() {
           colortype: color,
           papersize: size,
           paymenttype: payment,
-          userID: user ? user.uid : null, 
-          totalPages: numPages, 
-          transactionStatus: status, 
+          userID: user ? user.uid : null,
+          totalPages: numPages,
+          transactionStatus: status,
           transactionType: transaction,
+          totalPrice: totalPrice // Include total price in the data to be stored
         };
 
         push(tempDatabaseRef, fileData).then((newRef) => {
           const newID = newRef.key;
           setQRCodeData(newID);
-
         }).catch((error) => {
           console.error("Error pushing data to database:", error);
         });
@@ -67,7 +85,7 @@ function FileManagement() {
   const onFileChange = (event) => {
     const uploadedFile = event.target.files[0];
     setFileUpload(uploadedFile);
-    countPages(uploadedFile); 
+    countPages(uploadedFile);
   };
 
   const countPages = async (selectedFile) => {
@@ -76,7 +94,7 @@ function FileManagement() {
       const buffer = reader.result;
       const typedArray = new Uint8Array(buffer);
       const pdf = await pdfjs.getDocument(typedArray).promise;
-      setNumPages(pdf.numPages); 
+      setNumPages(pdf.numPages);
     };
     reader.readAsArrayBuffer(selectedFile);
   };
@@ -167,6 +185,7 @@ function FileManagement() {
             <QRCode value={qrCodeData} />
           </div>
         )}
+        <p>Total Price: ₱{totalPrice}</p> {}
       </div>
     </>
   );
