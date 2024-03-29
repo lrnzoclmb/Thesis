@@ -112,6 +112,7 @@ function FileManagement() {
         {numPages && ( 
           <p>Total Pages: {numPages}</p>
         )}
+        <p>Total Price: ₱{totalPrice}</p> {}
         <div className="payment-method">
           <h3>Payment Methods: </h3>
           <input
@@ -185,7 +186,7 @@ function FileManagement() {
             <QRCode value={qrCodeData} />
           </div>
         )}
-        <p>Total Price: ₱{totalPrice}</p> {}
+        
       </div>
     </>
   );
