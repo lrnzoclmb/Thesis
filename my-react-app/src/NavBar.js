@@ -17,7 +17,7 @@ const NavBar = () => {
               <Link to="/Topup" className='tab' >Top Up</Link>
             </li>
             <li>
-              <Link to="/Account" className='tab' >Account</Link>
+              <Link to="/Accountpage" className='tab' >Account</Link>
             </li>
           </ul>
         </nav>

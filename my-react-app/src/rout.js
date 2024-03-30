@@ -4,7 +4,7 @@ import Signup from './signup';
 import Login from './login';
 import Homepage from './Homepage';
 import FileManagement from './FileManagement';
-import Account from './Account';
+import Accountpage from './Accountpage';
 import Topup from './Topup';
 
 const Rout = () => {
@@ -21,7 +21,7 @@ const Rout = () => {
       <Route path="/Homepage" element={<Homepage />} />
       <Route path="/FileManagement" element={<FileManagement userProfile={userProfile} />}/>
       <Route path="/Topup" element={<Topup userProfile={userProfile} />}/>
-      <Route path="/Account" element={<Account userProfile={userProfile} />} />
+      <Route path="/Accountpage" element={<Accountpage userProfile={userProfile} />} />
     </Routes>
   );
 };

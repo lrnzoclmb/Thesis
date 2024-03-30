@@ -19,10 +19,10 @@ function FileManagement() {
   const [numPages, setNumPages] = useState(null);
   const [status] = useState('pending');
   const [transaction] = useState('printing');
-  const [totalPrice, setTotalPrice] = useState(0); // State variable to hold the total price
+  const [totalPrice, setTotalPrice] = useState(0); 
   const user = auth.currentUser;
 
-  // Prices for different options
+  
   const priceMap = {
     Colored: 5,
     BnW: 1,
@@ -30,13 +30,13 @@ function FileManagement() {
     Short: 1
   };
 
-  // Calculate total price based on selected options
+  
   useEffect(() => {
     const colorPrice = priceMap[color] || 0;
     const sizePrice = priceMap[size] || 0;
-    const totalPrice = (colorPrice + sizePrice) * (numPages || 0); // Multiply total price by total pages
+    const totalPrice = (colorPrice + sizePrice) * (numPages || 0); 
     setTotalPrice(totalPrice);
-  }, [color, size, numPages]); // Remove priceMap from the dependency array
+  }, [color, size, numPages]); 
   
 
   const isPDF = (file) => {

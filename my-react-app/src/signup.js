@@ -9,7 +9,7 @@ const Signup = () => {
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [pass, setPass] = useState('')
-  const [ userbalance ] = useState('0');
+  const [ userbalance ] = useState(0);
   const navigate = useNavigate()
 
   const submit = async(e) =>
@@ -20,7 +20,6 @@ const Signup = () => {
           const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, pass)
           const user = userCredential.user;
 
-          // Update display name in Firebase (optional)
           await user.updateProfile({
               displayName: `${firstName} ${lastName}`
           });
