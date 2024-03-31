@@ -5,9 +5,9 @@ import NavBar from './NavBar';
 import QRCode from 'react-qr-code'; 
 
 function TopUp() {
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState(null); // Changed to null to represent no selection
   const [transaction] = useState('topup');
-  const [ status ] = useState('pending'); 
+  const [status] = useState('pending'); 
   const [qrCodeData, setQRCodeData] = useState(null); 
   const user = auth.currentUser;
 
@@ -49,33 +49,33 @@ function TopUp() {
           <input
             type="radio"
             name="amount"
-            value="10"
+            value={10}
             id="ten"
-            onChange={() => setAmount('10')}
+            onChange={() => setAmount(10)}
           />
           <label htmlFor="ten">₱10</label>
           <input
             type="radio"
             name="amount"
-            value="20"
+            value={20}
             id="twenty"
-            onChange={() => setAmount('20')}
+            onChange={() => setAmount(20)}
           />
           <label htmlFor="twenty">₱20</label>
           <input
             type="radio"
             name="amount"
-            value="50"
+            value={50}
             id="fifty"
-            onChange={() => setAmount('50')}
+            onChange={() => setAmount(50)}
           />
           <label htmlFor="fifty">₱50</label>
           <input
             type="radio"
             name="amount"
-            value="100"
+            value={100}
             id="hundred"
-            onChange={() => setAmount('100')}
+            onChange={() => setAmount(100)}
           />
           <label htmlFor="hundred">₱100</label>
         </div>
