@@ -80,10 +80,10 @@ function TopUp() {
           <label htmlFor="hundred">₱100</label>
         </div>
         <button onClick={handleTopUp}>Top Up</button>
-        {qrCodeData && ( // Display QR code if data is available
+        {qrCodeData && ( 
           <div className="qr-code">
             <h3>QR Code:</h3>
-            <QRCode value={qrCodeData} /> {/* Generate QR code with the reference key */}
+            <QRCode value={qrCodeData} /> { }
           </div>
         )}
       </div>
