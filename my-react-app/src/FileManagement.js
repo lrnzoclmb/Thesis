@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { storage, database, auth } from './firebase';
+import firebase from 'firebase/compat/app'; 
+import 'firebase/compat/database'; 
+import { storage, auth, database } from './firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { ref as dbRef, push } from 'firebase/database';
 import { v4 } from 'uuid';
 import QRCode from 'react-qr-code';
 import NavBar from './NavBar';
 import { pdfjs } from 'react-pdf';
-import 'firebase/compat/auth';
-import 'firebase/compat/database';
 import './filemanage.css';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -35,23 +35,32 @@ function FileManagement() {
   useEffect(() => {
     const fetchUserBalance = async () => {
       try {
-        const user = auth.currentUser;
-        if (user) {
-          const userDataRef = database.ref('userData').child(key).child('balance');
-          userDataRef.once('value').then(snapshot => {
-            const userBalance = snapshot.val();
-            setBalance(userBalance || 0); // Set user's balance or default to 0 if not available
-          }).catch(error => {
-            console.error('Error fetching balance:', error);
+        const userDataRef = firebase.database().ref('userData');
+        userDataRef.once('value')
+          .then(snapshot => {
+            snapshot.forEach(childSnapshot => {
+              const key = childSnapshot.key; 
+              const balanceRef = userDataRef.child(key).child('balance');
+              balanceRef.once('value')
+                .then(balanceSnapshot => {
+                  const userBalance = balanceSnapshot.val();
+                  setBalance(userBalance || 0); 
+                })
+                .catch(error => {
+                  console.error('Error fetching balance:', error);
+                });
+            });
+          })
+          .catch(error => {
+            console.error('Error fetching user data:', error);
           });
-        }
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
     };
   
-    fetchUserBalance(); 
-  }, []); 
+    fetchUserBalance();
+  }, []);
 
   useEffect(() => {
     const colorPrice = priceMap[color] || 0;
@@ -64,7 +73,7 @@ function FileManagement() {
     if (payment === 'OnlinePayment') {
       const updatedBalance = balance - totalPrice;
       const user = auth.currentUser;
-      const userDataRef = database.ref('userData').child(key).child('balance');
+      const userDataRef = firebase.database().ref('userData').child(user.uid).child('balance');
       userDataRef.set(updatedBalance).then(() => {
         console.log('Balance updated successfully.');
       }).catch((error) => {
@@ -101,7 +110,7 @@ function FileManagement() {
           totalPages: numPages,
           transactionStatus: status,
           transactionType: transaction,
-          totalPrice: totalPrice // Include total price in the data to be stored
+          totalPrice: totalPrice,
         };
 
         push(tempDatabaseRef, fileData).then((newRef) => {
@@ -229,3 +238,4 @@ function FileManagement() {
 }
 
 export default FileManagement;
+ 
