@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { storage, db, auth } from './firebase';
+import { storage, database, auth } from './firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { ref as dbRef, push } from 'firebase/database';
 import { v4 } from 'uuid';
 import QRCode from 'react-qr-code';
 import NavBar from './NavBar';
 import { pdfjs } from 'react-pdf';
+import 'firebase/compat/auth';
+import 'firebase/compat/database';
 import './filemanage.css';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -20,8 +22,8 @@ function FileManagement() {
   const [status] = useState('pending');
   const [transaction] = useState('printing');
   const [totalPrice, setTotalPrice] = useState(0); 
+  const [balance, setBalance] = useState(null); 
   const user = auth.currentUser;
-
   
   const priceMap = {
     Colored: 5,
@@ -30,7 +32,27 @@ function FileManagement() {
     Short: 1
   };
 
+  useEffect(() => {
+    const fetchUserBalance = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userDataRef = database.ref('userData').child(key).child('balance');
+          userDataRef.once('value').then(snapshot => {
+            const userBalance = snapshot.val();
+            setBalance(userBalance || 0); // Set user's balance or default to 0 if not available
+          }).catch(error => {
+            console.error('Error fetching balance:', error);
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
   
+    fetchUserBalance(); 
+  }, []); 
+
   useEffect(() => {
     const colorPrice = priceMap[color] || 0;
     const sizePrice = priceMap[size] || 0;
@@ -38,6 +60,18 @@ function FileManagement() {
     setTotalPrice(totalPrice);
   }, [color, size, numPages]); 
   
+  const handleOnlinePayment = () => {
+    if (payment === 'OnlinePayment') {
+      const updatedBalance = balance - totalPrice;
+      const user = auth.currentUser;
+      const userDataRef = database.ref('userData').child(key).child('balance');
+      userDataRef.set(updatedBalance).then(() => {
+        console.log('Balance updated successfully.');
+      }).catch((error) => {
+        console.error("Error updating balance:", error);
+      });
+    }
+  };
 
   const isPDF = (file) => {
     return file.type === "application/pdf";
@@ -52,7 +86,7 @@ function FileManagement() {
     }
 
     const fileRef = storageRef(storage, `files/${v4()}`);
-    const tempDatabaseRef = dbRef(db, 'transaction');
+    const tempDatabaseRef = dbRef(database, 'transaction');
 
     uploadBytes(fileRef, fileUpload).then(() => {
       getDownloadURL(fileRef).then((downloadURL) => {
@@ -80,6 +114,7 @@ function FileManagement() {
     }).catch((error) => {
       console.error("Error uploading file to storage:", error);
     });
+    handleOnlinePayment();
   };
 
   const onFileChange = (event) => {
@@ -113,33 +148,7 @@ function FileManagement() {
           <p>Total Pages: {numPages}</p>
         )}
         <p>Total Price: ₱{totalPrice}</p> {}
-        <div className="payment-method">
-          <h3>Payment Methods: </h3>
-          <input
-            type="radio"
-            name="payments"
-            value="TapID"
-            id="TapId"
-            onChange={() => setPayment('TapID')}
-          />
-          <label htmlFor="TapId">Tap ID</label>
-          <input
-            type="radio"
-            name="payments"
-            value="OnlinePayment"
-            id="TOnlinepayment"
-            onChange={() => setPayment('OnlinePayment')}
-          />
-          <label htmlFor="TapId">Online Payment</label>
-          <input
-            type="radio"
-            name="payments"
-            value="Coin"
-            id="insert"
-            onChange={() => setPayment('Coin')}
-          />
-          <label htmlFor="insert">Insert Coin</label>
-        </div>
+        
         <div className="color-mode">
           <h3>Color Mode: </h3>
           <input
@@ -177,6 +186,33 @@ function FileManagement() {
             onChange={() => setSize('Short')}
           />
           <label htmlFor="short">Short</label>
+          <div className="payment-method">
+          <h3>Payment Methods: </h3>
+          <input
+            type="radio"
+            name="payments"
+            value="TapID"
+            id="TapId"
+            onChange={() => setPayment('TapID')}
+          />
+          <label htmlFor="TapId">Tap ID</label>
+          <input
+            type="radio"
+            name="payments"
+            value="OnlinePayment"
+            id="TOnlinepayment"
+            onChange={() => setPayment('OnlinePayment')}
+          />
+          <label htmlFor="TapId">Online Payment</label>
+          <input
+            type="radio"
+            name="payments"
+            value="Coin"
+            id="insert"
+            onChange={() => setPayment('Coin')}
+          />
+          <label htmlFor="insert">Insert Coin</label>
+        </div>
         </div>
         
         <button onClick={uploadFile}>Generate Ticket</button>

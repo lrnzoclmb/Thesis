@@ -28,8 +28,9 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
     console.error('Error enabling session persistence:', error);
   });
 
-const auth = getAuth(app); // Get the authentication object
-export default app;
-export const storage = getStorage(app);
-export const db = getDatabase(app);
-export { auth }; // Export the auth object for authentication
+  const auth = getAuth(app); // Get the authentication object
+const storage = getStorage(app); // Get the storage object
+const database = getDatabase(app); // Get the database object
+
+export { auth, storage, database }; // Export the auth, storage, and database objects for authentication, storage, and database access respectively
+export default app; // Export the default firebase app instance

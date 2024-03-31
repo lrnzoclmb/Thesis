@@ -57,7 +57,7 @@ function Accountpage() {
         <div>
           <p>Name: {name}</p>
           <p>Email: {email}</p>
-          <p>Balance: {balance !== null ? balance : 'Loading...'}</p> {/* Display 'Loading...' while balance is being fetched */}
+          <p>Balance: ₱{balance !== null ? balance : 'Loading...'}</p> { }
         </div>
       </div>
     </>

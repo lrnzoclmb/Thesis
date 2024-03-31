@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { db, auth } from './firebase';
+import { database, auth } from './firebase';
 import { ref as dbRef, push } from 'firebase/database';
 import NavBar from './NavBar';
 import QRCode from 'react-qr-code'; 
@@ -17,7 +17,7 @@ function TopUp() {
       return;
     }
 
-    const tempDatabaseRef = dbRef(db, 'transaction');
+    const tempDatabaseRef = dbRef( database, 'transaction');
 
     const topUpData = {
       userId: user ? user.uid : null,
