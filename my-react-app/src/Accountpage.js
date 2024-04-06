@@ -4,6 +4,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/database';
 import NavBar from './NavBar';
+import './filemanage.css';
 
 function Accountpage({ userProfile }) {
   const navigate = useNavigate();
@@ -50,8 +51,7 @@ function Accountpage({ userProfile }) {
 
   const handleLogout = () => {
     firebase.auth().signOut().then(() => {
-      // Sign-out successful.
-      // Redirect to login page
+      
       navigate('/');
     }).catch((error) => {
       console.error('Error signing out:', error);
@@ -61,7 +61,7 @@ function Accountpage({ userProfile }) {
   return (
     <>
       <NavBar />
-      <div>
+      <div className="file-management">
         <div>
           <p>Name: {name}</p>
           <p>Email: {email}</p>
