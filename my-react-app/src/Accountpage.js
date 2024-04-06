@@ -1,33 +1,31 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/database';
 import NavBar from './NavBar';
 
-function Accountpage() {
+function Accountpage({ userProfile }) {
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [balance, setBalance] = useState(null); // Initialize balance as null
+  const [balance, setBalance] = useState(null);
 
   useEffect(() => {
     const fetchUserBalance = async () => {
       try {
         const user = firebase.auth().currentUser;
         if (user) {
-          setName(user.displayName || ''); // Set the user's name
+          setName(user.displayName || '');
           setEmail(user.email);
 
-          // Reference to the userData node
           const userDataRef = firebase.database().ref('userData');
-
-          // Fetch user data
           userDataRef.once('value')
             .then(snapshot => {
               snapshot.forEach(childSnapshot => {
                 const key = childSnapshot.key; 
                 const balanceRef = userDataRef.child(key).child('balance'); 
 
-                
                 balanceRef.once('value')
                   .then(balanceSnapshot => {
                     const userBalance = balanceSnapshot.val();
@@ -47,8 +45,18 @@ function Accountpage() {
       }
     };
 
-    fetchUserBalance(); // Call fetchUserBalance function
-  }, []); // Empty dependency array to run once on mount
+    fetchUserBalance();
+  }, []);
+
+  const handleLogout = () => {
+    firebase.auth().signOut().then(() => {
+      // Sign-out successful.
+      // Redirect to login page
+      navigate('/');
+    }).catch((error) => {
+      console.error('Error signing out:', error);
+    });
+  };
 
   return (
     <>
@@ -57,7 +65,8 @@ function Accountpage() {
         <div>
           <p>Name: {name}</p>
           <p>Email: {email}</p>
-          <p>Balance: ₱{balance !== null ? balance : 'Loading...'}</p> { }
+          <p>Balance: ₱{balance !== null ? balance : 'Loading...'}</p>
+          <button onClick={handleLogout}>Logout</button>
         </div>
       </div>
     </>
