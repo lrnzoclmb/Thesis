@@ -62,7 +62,7 @@ function Accountpage({ userProfile }) {
     <>
       <NavBar />
       <div className="account">
-        <div>
+        <div className="profile">
           <p>Name: {name}</p>
           <p>Email: {email}</p>
           <p>Balance: ₱{balance !== null ? balance : 'Loading...'}</p>

@@ -20,13 +20,13 @@
     padding: 10px 30px;
     border: none;
     outline: none;
-    background: #C6CF9B;
+    background: #fff;
     border-radius: 5px;
     color: #11235A;
     font-weight: 600;
   }
 
-.App button .start
+.App .start
 {
     text-decoration: none;
 }

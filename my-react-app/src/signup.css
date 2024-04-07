@@ -22,7 +22,7 @@ body
     outline: none;
     border: none;
     border-radius: 5px;
-    border-top: 10px solid #F6ECA9;
+    border-top: 10px solid #fff;
 }
 
 .main_container_signup .header
@@ -33,7 +33,7 @@ body
 .main_container_signup .header h2
 {
     text-align: center;
-    color: #F6ECA9;
+    color: #fff;
     font-size: 18px;
     text-transform: uppercase;
     font-weight: 600;
@@ -54,14 +54,14 @@ body
     outline: none;
     border: none;
     border-radius: 5px;
-    border: 1px solid #C6CF9B;
+    border: 1px solid #fff;
 }
 
 .main_container_signup p
 {
     margin-top: 15px;
     font-size: 12px;
-    color: #F6ECA9;
+    color: #fff;
     margin-left: 30px;
     font-weight: 600;
 }
@@ -73,7 +73,7 @@ body
     padding: 10px 30px;
     border: none;
     outline: none;
-    background: #C6CF9B;
+    background: #fff;
     border-radius: 5px;
     color: #11235A;
     font-weight: 600;
