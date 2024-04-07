@@ -24,10 +24,10 @@
   }
 
   .profile {
-    margin: 20px; /* Adjust the value as needed */
+    margin: 20px; 
     padding: 20px;
 }
 
 .profile p {
-    margin: 10px 0; /* Add space between paragraphs */
+    margin: 10px 0; 
 }
