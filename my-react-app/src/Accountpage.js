@@ -4,7 +4,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/database';
 import NavBar from './NavBar';
-import './filemanage.css';
+import './accountpage.css';
 
 function Accountpage({ userProfile }) {
   const navigate = useNavigate();
@@ -61,7 +61,7 @@ function Accountpage({ userProfile }) {
   return (
     <>
       <NavBar />
-      <div className="file-management">
+      <div className="account">
         <div>
           <p>Name: {name}</p>
           <p>Email: {email}</p>
