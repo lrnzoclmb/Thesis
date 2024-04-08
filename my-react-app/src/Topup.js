@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { database, auth } from './firebase';
 import { ref as dbRef, push } from 'firebase/database';
 import NavBar from './NavBar';
-import QRCode from 'react-qr-code'; 
+import QRCode from 'react-qr-code';
+import 'typeface-montserrat'; 
 
 function TopUp() {
   const [amount, setAmount] = useState(null); // Changed to null to represent no selection

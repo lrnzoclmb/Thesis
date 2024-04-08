@@ -7,6 +7,7 @@ import { countries } from "./Data";
 import "./Homepage.css";
 import NavBar from './NavBar';
 import { Link } from 'react-router-dom';
+import 'typeface-montserrat';
 
 const Homepage = () => {
   useEffect(() => {

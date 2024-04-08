@@ -9,6 +9,7 @@ import QRCode from 'react-qr-code';
 import NavBar from './NavBar';
 import { pdfjs } from 'react-pdf';
 import './filemanage.css';
+import 'typeface-montserrat';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 

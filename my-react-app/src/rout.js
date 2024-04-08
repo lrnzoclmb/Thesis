@@ -6,6 +6,7 @@ import Homepage from './Homepage';
 import FileManagement from './FileManagement';
 import Accountpage from './Accountpage';
 import Topup from './Topup';
+import 'typeface-montserrat';
 
 const Rout = () => {
   const [userProfile, setUserProfile] = useState(null);

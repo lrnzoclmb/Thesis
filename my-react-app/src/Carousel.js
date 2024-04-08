@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useState } from "react";
 import "./Carousel.css";
+import 'typeface-montserrat';
 
 function Carousel({ images }) {
   const [current, setCurrent] = useState(0);

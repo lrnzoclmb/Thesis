@@ -5,6 +5,7 @@ import 'firebase/compat/auth';
 import 'firebase/compat/database';
 import NavBar from './NavBar';
 import './accountpage.css';
+import 'typeface-montserrat';
 
 function Accountpage({ userProfile }) {
   const navigate = useNavigate();
@@ -62,9 +63,11 @@ function Accountpage({ userProfile }) {
     <>
       <NavBar />
       <div className="account">
-        <div className="profile">
-          <p>Name: {name}</p>
-          <p>Email: {email}</p>
+         
+          <div className="profile">
+          <img src="\profile.jpg" alt="Picture" className="profile-picture" />
+          <p className='name'> {name}</p>
+          <p> {email}</p>
           <p>Balance: ₱{balance !== null ? balance : 'Loading...'}</p>
           <button onClick={handleLogout}>Logout</button>
         </div>

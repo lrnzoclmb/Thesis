@@ -5,6 +5,7 @@ import 'firebase/compat/database';
 import { getStorage } from 'firebase/storage';
 import { getDatabase } from 'firebase/database';
 import { getAuth } from 'firebase/auth';
+import 'typeface-montserrat';
 
 
 const firebaseConfig = {
