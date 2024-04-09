@@ -73,7 +73,24 @@ function Accountpage({ userProfile }) {
         </div>
         <div className='history'>
           <p>Transaction History</p>
-        </div>
+              <table>
+                <thead>
+                  <tr>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  </tr>
+                </thead>
+          <tbody>
+      < tr>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      { }
+    </tbody>
+  </table>
+</div>
       </div>
     </>
   );
