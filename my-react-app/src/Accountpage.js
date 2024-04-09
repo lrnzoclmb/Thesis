@@ -71,6 +71,10 @@ function Accountpage({ userProfile }) {
           <p>Balance: ₱{balance !== null ? balance : 'Loading...'}</p>
           <button onClick={handleLogout}>Logout</button>
         </div>
+        <div>
+          <p>Transaction History</p>
+
+        </div>
       </div>
     </>
   );
