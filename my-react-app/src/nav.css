@@ -11,7 +11,7 @@ nav {
   position: sticky;
   top: 0;
   padding: 0.25rem 1rem; 
-  height: 3rem; 
+  height: 5rem; 
 }
 
 
@@ -83,7 +83,7 @@ nav .menu span {
       display: none;
       flex-direction: column;
       width: 100%;
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.50rem;
   }
 
   nav ul.open {
@@ -98,10 +98,18 @@ nav .menu span {
   nav ul li a {
     margin: 0.1rem; 
   }
+
+  nav .title-container {
+    font-size: 1.2rem; /* Smaller font size */
+    margin: 0.5rem; /* Less margin */
+    text-align: center; /* Centering the title */
+    width: 100%; /* Expand the width to take up the full space */
+    height: 50%;
+  }
 }
 
 .logo {
-  width: 40px; 
-  height: 40px; 
+  width: 100px; 
+  height: 100px; 
   object-fit: contain;
 }
