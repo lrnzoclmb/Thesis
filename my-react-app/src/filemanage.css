@@ -1,8 +1,9 @@
 .file-management {
   background-color: #596FB7;
   padding: 20px 30px;
-  margin: 100px auto 0;
-  width: 500px;
+  margin: 50px auto 0;  
+  width: 90%; 
+  max-width: 500px; 
   outline: none;
   border: none;
   border-radius: 5px;
@@ -24,10 +25,10 @@
 
 .file-management button {
   margin-top: 10px;
-  padding: 10px 30px;
+  padding: 10px 20px; 
   border: none;
   outline: none;
-  background: #ffff;
+  background: #ffffff;
   border-radius: 5px;
   color: #11235A;
   font-weight: 600;
@@ -49,29 +50,26 @@
   letter-spacing: 1px;
 }
 
-.payment-method h3
-{
+.payment-method h3 {
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
-.payment-method input[type="radio"]
-{
+.payment-method input[type="radio"] {
   margin-bottom: 15px;
-  margin-left: 10px; 
+  margin-left: 10px;
 }
 
 .payment-method input[id="TapId"],
-.payment-method input[id="insert"]
-{
+.payment-method input[id="insert"] {
   margin-right: 10px;
 }
 
-.color-mode h3
-{
+.color-mode h3 {
   margin-top: 10px;
   margin-bottom: 10px;
 }
+
 .paper-size h3 {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -79,23 +77,52 @@
 
 .paper-size input[type="radio"] {
   margin-bottom: 15px;
-  margin-left: 10px; 
-  
+  margin-left: 10px;
 }
 
 .paper-size input[id="long"],
-.paper-size input[id=short]
-{
+.paper-size input[id="short"] {
   margin-right: 10px;
 }
 
 .color-mode input[id="colored"],
 .color-mode input[id="bnw"] {
-  margin-right: 10px; 
-  
+  margin-right: 10px;
 }
 
 .color-mode input[type="radio"] {
-  margin-left: 10px; 
+  margin-left: 10px;
 }
 
+
+@media (max-width: 768px) {
+  .file-management {
+    padding: 15px; 
+  }
+
+  .file-management button {
+    padding: 10px 15px; 
+  }
+
+  .color-mode h3,
+  .paper-size h3,
+  .payment-method h3 {
+    font-size: 16px; 
+  }
+}
+
+@media (max-width: 480px) {
+  .file-management {
+    padding: 10px; 
+  }
+
+  .file-management button {
+    padding: 10px; 
+  }
+
+  .color-mode h3,
+  .paper-size h3,
+  .payment-method h3 {
+    font-size: 14px; 
+  }
+}

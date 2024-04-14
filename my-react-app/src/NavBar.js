@@ -1,30 +1,40 @@
-import React from 'react'
-import { Link  } from 'react-router-dom'
-import './nav.css'
-import 'typeface-montserrat';
+import React, { useState } from "react";
+import "./nav.css";
+import { Link, NavLink } from "react-router-dom";
 
-const NavBar = () => {
+export const NavBar = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
-    <div className='navbar'>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/Homepage" className='tab'>Home</Link>
-            </li>
-            <li>
-              <Link to="/FileManagement" className='tab'>File Uploading</Link>
-            </li>
-            <li>
-              <Link to="/Topup" className='tab' >Top Up</Link>
-            </li>
-            <li>
-              <Link to="/Accountpage" className='tab' >Account</Link>
-            </li>
-          </ul>
-        </nav>
+    <nav>
+    <div className="title-container">
+      <img src="\logo192.png" alt="Company Logo" className="logo" />
+      <Link to="/Homepage" className="title">
+        Falcon Print
+      </Link>
     </div>
+    <div className="menu" onClick={() => setMenuOpen(!menuOpen)}>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <ul className={menuOpen ? "open" : ""}>
+      <li>
+        <NavLink to="/Homepage">Home</NavLink>
+      </li>
+      <li>
+        <NavLink to="/FileManagement">File Uploading</NavLink>
+      </li>
+      <li>
+        <NavLink to="/Topup">Top Up</NavLink>
+      </li>
+      <li>
+        <NavLink to="/Accountpage">Account</NavLink>
+      </li>
+    </ul>
+  </nav>
+  
+  );
+};
 
-  )
-}
-
-export default NavBar
+export default NavBar;
