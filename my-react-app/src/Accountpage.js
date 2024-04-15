@@ -64,13 +64,17 @@ function Accountpage({ userProfile }) {
       <NavBar />
     <div className='account-container'>
       <div className="account">
-          <div className="profile">
-          <img src="\profile.jpg" alt="Picture" className="profile-picture" />
-          <p className='name'> {name}</p>
-          <p> {email}</p>
-          <p>Balance: ₱{balance !== null ? balance : 'Loading...'}</p>
-          <button onClick={handleLogout}>Logout</button>
+      <div className="profile">
+    <img src="\profile.jpg" alt="Picture" className="profile-picture" />
+    <div className="profile-info">
+        <p className='name'>{name}</p>
+        <p className='email'>{email}</p>
+        <p className='balance'>Balance: ₱{balance !== null ? balance : 'Loading...'}</p>
+        <div className='button-container'>
+            <button onClick={handleLogout}>Logout</button>
         </div>
+    </div>
+</div>
         <div className='history'>
           <p>Transaction History</p>
         </div>

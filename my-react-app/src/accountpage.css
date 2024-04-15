@@ -18,44 +18,54 @@
 }
 
 .profile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: flex; 
+  flex-direction: row; 
+  align-items: center; 
 }
 
 .profile-picture {
-  width: 100px;
-  height: 100px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
-  margin-bottom: 10px;
+  margin-right: 20px;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
 }
 
 .name {
-  font-size: 24px;
+  font-size: 30px;
   font-weight: bold;
-  margin-bottom: 5px;
+  text-transform: capitalize;
+  margin-top: 30px;
 }
 
 .email {
-  font-size: 16px;
-  margin-bottom: 15px;
+  font-size: 14px;
+  margin-bottom: 5px;
 }
 
 .balance {
-  font-size: 18px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  margin-bottom: 5px;
+  margin-top: 10px;
+
 }
 
 .button-container {
+  margin-top: 10px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
+  margin-left: 500px;
 }
 
 button {
   padding: 10px 20px;
   font-size: 16px;
   background-color: #007bff;
-  color: #ffffff;
+  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -65,6 +75,7 @@ button {
 button:hover {
   background-color: #0056b3;
 }
+
 
 .history {
   margin-top: 20px;

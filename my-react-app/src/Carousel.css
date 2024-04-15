@@ -20,7 +20,7 @@
   height: 100%;
   overflow: hidden;
   border-radius: 20px;
-  box-shadow: 0 0 11px 3px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 11px 3px rgba(0, 0, 0, 1);
   opacity: 0;
   pointer-events: none;
   transform: scale(0.8);
