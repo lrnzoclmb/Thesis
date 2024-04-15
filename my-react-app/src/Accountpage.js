@@ -62,8 +62,8 @@ function Accountpage({ userProfile }) {
   return (
     <>
       <NavBar />
+    <div className='account-container'>
       <div className="account">
-         
           <div className="profile">
           <img src="\profile.jpg" alt="Picture" className="profile-picture" />
           <p className='name'> {name}</p>
@@ -73,25 +73,9 @@ function Accountpage({ userProfile }) {
         </div>
         <div className='history'>
           <p>Transaction History</p>
-              <table>
-                <thead>
-                  <tr>
-                  <th>Date</th>
-                  <th>Description</th>
-                  <th>Amount</th>
-                  </tr>
-                </thead>
-          <tbody>
-      < tr>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
-      { }
-    </tbody>
-  </table>
-</div>
+        </div>
       </div>
+    </div>
     </>
   );
 }

@@ -6,12 +6,14 @@
 
 body 
 {
-    background-color:#172554;
+    background-color: #f5f5f5;;
 }
 
 .main_container_signup
 {
-    background-color: #596FB7;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     padding: 20px 30px;
     margin: 0px auto;
     width: 400px;
@@ -30,7 +32,7 @@ body
 .main_container_signup .header h2
 {
     text-align: center;
-    color: #fff;
+    color: #000000;
     font-size: 18px;
     text-transform: uppercase;
     font-weight: 600;
@@ -51,14 +53,14 @@ body
     outline: none;
     border: none;
     border-radius: 5px;
-    border: 1px solid #fff;
+    border: 1px solid #000000;
 }
 
 .main_container_signup p
 {
     margin-top: 15px;
     font-size: 12px;
-    color: #fff;
+    color: #000000;
     margin-left: 30px;
     font-weight: 600;
 }
@@ -70,9 +72,9 @@ body
     padding: 10px 30px;
     border: none;
     outline: none;
-    background: #fff;
+    background-color: #007bff;
+    color: #ffffff;
     border-radius: 5px;
-    color: #11235A;
     font-weight: 600;
 }
 

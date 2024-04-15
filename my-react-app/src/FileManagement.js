@@ -148,6 +148,7 @@ function FileManagement() {
     <>
       <NavBar />
       <div className="file-management">
+      <h2>File Uploading </h2>
         <input 
           type="file"
           accept=".pdf"
@@ -210,10 +211,10 @@ function FileManagement() {
             type="radio"
             name="payments"
             value="OnlinePayment"
-            id="TOnlinepayment"
+            id="Onlinepayment"
             onChange={() => setPayment('OnlinePayment')}
           />
-          <label htmlFor="TapId">Online Payment</label>
+          <label htmlFor="Onlinepayment">Online Payment</label>
           <input
             type="radio"
             name="payments"

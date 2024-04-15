@@ -1,5 +1,7 @@
 .file-management {
-  background-color: #596FB7;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   padding: 20px 30px;
   margin: 50px auto 0;  
   width: 90%; 
@@ -10,6 +12,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.file-management h2{
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+  font-weight: bold;
+  font-size: 45px;
+  color: #0f172a;
 }
 
 .color-mode,
@@ -24,16 +34,18 @@
 }
 
 .file-management button {
-  margin-top: 10px;
-  padding: 10px 20px; 
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: #ffffff;
   border: none;
-  outline: none;
-  background: #ffffff;
   border-radius: 5px;
-  color: #11235A;
-  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
-
+.file-management button:hover{
+  background-color: #0056b3;
+}
 .file-management input[id="upload"] {
   margin-left: auto;
   margin-bottom: 10px;
@@ -43,7 +55,7 @@
 .paper-size h3,
 .payment-method h3 {
   text-align: center;
-  color: #fff;
+  color: #000000;
   font-size: 18px;
   text-transform: uppercase;
   font-weight: 600;
@@ -61,7 +73,8 @@
 }
 
 .payment-method input[id="TapId"],
-.payment-method input[id="insert"] {
+.payment-method input[id="insert"],
+.payment-method input[id="Onlinepayment"] {
   margin-right: 10px;
 }
 

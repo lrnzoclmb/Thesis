@@ -6,10 +6,16 @@ import Carousel from "./Carousel";
 import { countries } from "./Data";
 import "./Homepage.css";
 import NavBar from './NavBar';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import 'typeface-montserrat';
 
 const Homepage = () => {
+  const navigate = useNavigate();
+  
+  const handleClick = () => {
+    navigate('/Filemanagement');
+  };
+
   useEffect(() => {
  
     const unsubscribe = firebase.auth().onAuthStateChanged(user => {
@@ -28,6 +34,7 @@ const Homepage = () => {
     });
 
     
+    
     return () => unsubscribe();
   }, []);
 
@@ -38,7 +45,9 @@ const Homepage = () => {
       <div className="App">
       {/* Carousel */}
       <Carousel images={countries} />
-      <button><Link to="/Filemanagement" className="start" >Get Started</Link></button>
+      <button onClick={handleClick} className="start">
+      Get Started
+    </button>
     </div>
     </>
   );
