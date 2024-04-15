@@ -12,6 +12,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  
 }
 
 .file-management h2{
@@ -20,6 +21,10 @@
   font-weight: bold;
   font-size: 45px;
   color: #007bff;
+}
+.color-mode {
+  width: 100%; /* Set the width to 100% to extend the line */
+  border-top: 1px solid #0f0f0f;
 }
 
 .color-mode,
@@ -49,6 +54,7 @@
 .file-management input[id="upload"] {
   margin-left: auto;
   margin-bottom: 10px;
+  
 }
 
 .color-mode h3,
