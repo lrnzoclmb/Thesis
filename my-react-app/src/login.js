@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import firebase from './firebase';
 import './signup.css'
 import 'typeface-montserrat';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -34,6 +35,7 @@ const Login = () => {
   return (
     <>
     <div className='main_container_signup'>
+    <img src="\logo192.png" alt="Picture" className="logo" />
       <div className='header'>
         <h2>Login</h2>
       </div>

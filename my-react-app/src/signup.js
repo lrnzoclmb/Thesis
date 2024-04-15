@@ -3,6 +3,7 @@ import './signup.css'
 import { Link, useNavigate } from 'react-router-dom'
 import firebase from './firebase'
 import 'typeface-montserrat';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Signup = () => {
 
@@ -44,7 +45,9 @@ const Signup = () => {
   }
   return (
     <>
+    
     <div className='main_container_signup'>
+    <img src="\logo192.png" alt="Picture" className="logo" />
       <div className='header'>
         <h2>Signup</h2>
       </div>
@@ -63,7 +66,9 @@ const Signup = () => {
       <p>Already have an Account <Link to="/">Login Now</Link></p>
       
       <button onClick={submit}>Signup</button>
+      
     </div>
+    
     </>
   )
 }
