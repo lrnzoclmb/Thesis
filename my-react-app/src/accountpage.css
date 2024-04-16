@@ -81,10 +81,15 @@ button:hover {
   margin-top: 20px;
   border-top: 1px solid #0f0f0f;
   padding-top: 20px;
+  padding-bottom: 150px;
 }
 
 .history p {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 10px;
+}
+
+.topup{
+  font-size: 12px;
 }

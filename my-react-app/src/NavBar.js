@@ -26,9 +26,6 @@ export const NavBar = () => {
         <NavLink to="/FileManagement">File Uploading</NavLink>
       </li>
       <li>
-        <NavLink to="/Topup">Top Up</NavLink>
-      </li>
-      <li>
         <NavLink to="/Accountpage">Account</NavLink>
       </li>
     </ul>

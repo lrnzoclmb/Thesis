@@ -6,6 +6,7 @@ import 'firebase/compat/database';
 import NavBar from './NavBar';
 import './accountpage.css';
 import 'typeface-montserrat';
+import { Link } from "react-router-dom";
 
 function Accountpage({ userProfile }) {
   const navigate = useNavigate();
@@ -70,6 +71,7 @@ function Accountpage({ userProfile }) {
         <p className='name'>{name}</p>
         <p className='email'>{email}</p>
         <p className='balance'>Balance: ₱{balance !== null ? balance : 'Loading...'}</p>
+        <p className='topup'>Insufficient balance? Add funds <Link  to="/Topup">here.</Link></p>
         <div className='button-container'>
             <button onClick={handleLogout}>Logout</button>
         </div>

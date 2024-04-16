@@ -1,80 +1,57 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { database, auth } from './firebase';
-import { ref as dbRef, push } from 'firebase/database';
+import { ref as dbRef, get } from 'firebase/database';
 import NavBar from './NavBar';
 import QRCode from 'react-qr-code';
-import 'typeface-montserrat'; 
+import 'typeface-montserrat';
 
 function TopUp() {
-  const [transaction] = useState('topup');
-  const [status] = useState('pending'); 
-  const [qrCodeData, setQRCodeData] = useState(null); 
-  const user = auth.currentUser;
+    const [qrCodeData, setQRCodeData] = useState(null);
+    const user = auth.currentUser;
 
-  // Convert QR code data to a data URL
-  const convertQRCodeToDataURL = (qrCodeData) => {
-    return new Promise((resolve, reject) => {
-      const canvas = document.createElement('canvas');
-      const qrCodeElement = <QRCode value={qrCodeData} size={256} />;
-      // Render the QR code onto the canvas
-      const qrCodeSvg = new XMLSerializer().serializeToString(qrCodeElement);
-      const img = new Image();
-      img.onload = () => {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        resolve(canvas.toDataURL('image/png'));
-      };
-      img.onerror = (error) => reject(error);
-      img.src = `data:image/svg+xml;base64,${btoa(qrCodeSvg)}`;
-    });
-  };
+    // Function to handle top-up
+    const handleTopUp = async () => {
+        if (user) {
+            // Define the reference to the user's data in the Firebase database
+            const userRef = dbRef(database, `userData/${user.uid}`);
 
-  const handleTopUp = async () => {
-    const tempDatabaseRef = dbRef(database, 'transaction');
+            // Fetch the user's data from the database
+            try {
+                const snapshot = await get(userRef);
+                if (snapshot.exists()) {
+                    // The push key is the path of userRef, which can be determined by the user's UID
+                    const pushKey = user.uid;
 
-    const topUpData = {
-      userId: user ? user.uid : null,
-      timestamp: Date.now(),
-      transactionStatus: status,
-      transactionType: transaction,
+                    // Set the QR code data to be the push key
+                    setQRCodeData(pushKey);
+                } else {
+                    console.log('No data available for the user.');
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        } else {
+            console.log('No user is logged in');
+        }
     };
 
-    try {
-      const newRef = await push(tempDatabaseRef, topUpData);
-      console.log("Top-up transaction added to database successfully!");
-      const refKey = newRef.key;
-      setQRCodeData(refKey);
-
-      // Convert the QR code data to a data URL
-      const qrCodeDataURL = await convertQRCodeToDataURL(refKey);
-      
-      // Display the QR code image in an alert
-      alert(`Your QR Code:\n\n${qrCodeDataURL}`);
-      
-    } catch (error) {
-      console.error("Error adding top-up transaction to database:", error);
-    }
-  };
-
-  return (
-    <>
-      <NavBar />
-      <div className="file-management">
-        <div className="payment-method">
-          <h2>Top Up</h2>
-          <button onClick={handleTopUp}>Top Up</button>
-          {qrCodeData && (
-            <div className="qr-code">
-              <h3>QR Code:</h3>
-              <QRCode value={qrCodeData} />
+    return (
+        <>
+            <NavBar />
+            <div className="file-management">
+                <div className="payment-method">
+                    <h2>Top Up</h2>
+                    <button onClick={handleTopUp}>Generate Ticket</button>
+                    {qrCodeData && (
+                        <div className="qr-code">
+                            <h3>QR Code:</h3>
+                            <QRCode value={qrCodeData} />
+                        </div>
+                    )}
+                </div>
             </div>
-          )}
-        </div>
-      </div>
-    </>
-  );
+        </>
+    );
 }
 
 export default TopUp;

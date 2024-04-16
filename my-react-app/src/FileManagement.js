@@ -159,7 +159,6 @@ function FileManagement() {
           <p>Total Pages: {numPages}</p>
         )}
         <p>Total Price: ₱{totalPrice}</p> {}
-        
         <div className="color-mode">
           <h3>Color Mode: </h3>
           <input
