@@ -57,8 +57,7 @@
 .button-container {
   margin-top: 10px;
   display: flex;
-  justify-content: flex-end;
-  margin-left: 500px;
+  justify-content: flex-start;
 }
 
 button {

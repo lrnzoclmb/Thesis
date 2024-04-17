@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import firebase from 'firebase/compat/app'; 
-import 'firebase/compat/database'; 
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/database';
 import { storage, auth, database } from './firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { ref as dbRef, push } from 'firebase/database';
+import { ref as dbRef, push, child } from 'firebase/database';
 import { v4 } from 'uuid';
 import QRCode from 'react-qr-code';
 import NavBar from './NavBar';
@@ -22,9 +22,9 @@ function FileManagement() {
     const [numPages, setNumPages] = useState(null);
     const [status] = useState('pending');
     const [transaction] = useState('printing');
-    const [totalPrice, setTotalPrice] = useState(0); 
-    const [balance, setBalance] = useState(null); 
-    const [userBalanceRef, setUserBalanceRef] = useState(null); 
+    const [totalPrice, setTotalPrice] = useState(0);
+    const [balance, setBalance] = useState(null);
+    const [userBalanceRef, setUserBalanceRef] = useState(null);
     const user = auth.currentUser;
 
     const priceMap = {
@@ -39,7 +39,6 @@ function FileManagement() {
             try {
                 const userDataRef = firebase.database().ref('userData').child(user.uid);
                 const balanceRef = userDataRef.child('balance');
-                
                 
                 setUserBalanceRef(balanceRef);
                 
@@ -64,10 +63,10 @@ function FileManagement() {
     useEffect(() => {
         const colorPrice = priceMap[color] || 0;
         const sizePrice = priceMap[size] || 0;
-        const totalPrice = (colorPrice + sizePrice) * (numPages || 0); 
+        const totalPrice = (colorPrice + sizePrice) * (numPages || 0);
         setTotalPrice(totalPrice);
-    }, [color, size, numPages]); 
-    
+    }, [color, size, numPages]);
+
     const handleOnlinePayment = () => {
         if (payment === 'OnlinePayment' && userBalanceRef) {
             const updatedBalance = balance - totalPrice;
@@ -95,6 +94,7 @@ function FileManagement() {
 
         const fileRef = storageRef(storage, `files/${v4()}`);
         const tempDatabaseRef = dbRef(database, 'transaction');
+        const userTransactionHistoryRef = child(dbRef(database, 'transactionHistory'), user.uid); // Reference to user's transaction history
 
         uploadBytes(fileRef, fileUpload).then(() => {
             getDownloadURL(fileRef).then((downloadURL) => {
@@ -112,11 +112,17 @@ function FileManagement() {
                     totalPrice: totalPrice,
                 };
 
+                // Push data to the `transaction` node
                 push(tempDatabaseRef, fileData).then((newRef) => {
                     const newID = newRef.key;
                     setQRCodeData(newID);
                 }).catch((error) => {
                     console.error("Error pushing data to database:", error);
+                });
+
+                // Push data to user's `transactionHistory` node
+                push(userTransactionHistoryRef, fileData).catch((error) => {
+                    console.error("Error pushing data to user's transaction history:", error);
                 });
             });
         }).catch((error) => {
@@ -157,7 +163,7 @@ function FileManagement() {
                 {numPages && (
                     <p>Total Pages: {numPages}</p>
                 )}
-                <p>Total Price: ₱{totalPrice}</p> {}
+                <p>Total Price: ₱{totalPrice}</p>
                 <div className="color-mode">
                     <h3>Color Mode: </h3>
                     <input
@@ -195,7 +201,8 @@ function FileManagement() {
                         onChange={() => setSize('Short')}
                     />
                     <label htmlFor="short">Short</label>
-                    <div className="payment-method">
+                </div>
+                <div className="payment-method">
                     <h3>Payment Methods: </h3>
                     <input
                         type="radio"
@@ -222,8 +229,6 @@ function FileManagement() {
                     />
                     <label htmlFor="insert">Insert Coin</label>
                 </div>
-            </div>
-                
                 <button onClick={uploadFile}>Generate Ticket</button>
                 {qrCodeData && (
                     <div className="qr-code">
