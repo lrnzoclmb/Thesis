@@ -19,15 +19,14 @@ function Accountpage() {
       try {
         const user = firebase.auth().currentUser;
         if (user) {
-          // Set name and email
+          
           setName(user.displayName || '');
           setEmail(user.email);
           
-          // Access the user's data in the Realtime Database using UID
+          
           const userDataRef = firebase.database().ref(`userData/${user.uid}`);
           const balanceRef = userDataRef.child('balance');
 
-          // Fetch user's balance
           const balanceSnapshot = await balanceRef.once('value');
           const userBalance = balanceSnapshot.val();
           setBalance(userBalance);

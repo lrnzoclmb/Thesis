@@ -100,10 +100,10 @@ nav .menu span {
   }
 
   nav .title-container {
-    font-size: 1.2rem; /* Smaller font size */
-    margin: 0.5rem; /* Less margin */
-    text-align: center; /* Centering the title */
-    width: 100%; /* Expand the width to take up the full space */
+    font-size: 1.2rem;
+    margin: 0.5rem;
+    text-align: center;
+    width: 100%;
     height: 75%;
   }
 }

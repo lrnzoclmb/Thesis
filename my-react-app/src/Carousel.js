@@ -38,7 +38,7 @@ function Carousel({ images }) {
       <div className="carousel_wrapper">
         {images.map((image, index) => {
           return (
-            /* (condition) ? true : false */
+
 
             <div
               key={index}

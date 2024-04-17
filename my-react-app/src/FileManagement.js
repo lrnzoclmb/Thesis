@@ -24,7 +24,7 @@ function FileManagement() {
     const [transaction] = useState('printing');
     const [totalPrice, setTotalPrice] = useState(0); 
     const [balance, setBalance] = useState(null); 
-    const [userBalanceRef, setUserBalanceRef] = useState(null); // Reference to user's balance
+    const [userBalanceRef, setUserBalanceRef] = useState(null); 
     const user = auth.currentUser;
 
     const priceMap = {
@@ -40,7 +40,7 @@ function FileManagement() {
                 const userDataRef = firebase.database().ref('userData').child(user.uid);
                 const balanceRef = userDataRef.child('balance');
                 
-                // Store reference to user's balance in state
+                
                 setUserBalanceRef(balanceRef);
                 
                 balanceRef.once('value')
@@ -123,7 +123,6 @@ function FileManagement() {
             console.error("Error uploading file to storage:", error);
         });
 
-        // Update balance when online payment is selected
         handleOnlinePayment();
     };
 
