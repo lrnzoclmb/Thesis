@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import firebase from './firebase';
 import './signup.css'
 import 'typeface-montserrat';
-import 'bootstrap-icons/font/bootstrap-icons.css';
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
