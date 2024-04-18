@@ -61,7 +61,6 @@ function Accountpage() {
             <div className='account-container'>
                 <div className="account">
                     <div className="profile">
-                        <img src="\profile.jpg" alt="Picture" className="profile-picture" />
                         <div className="profile-info">
                             <p className='name'>{name}</p>
                             <p className='email'>{email}</p>

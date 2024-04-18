@@ -12,9 +12,9 @@ import './filemanage.css';
 import 'typeface-montserrat';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
+// Function to format the timestamp to a date string
 function formatTimestampToDateString(timestamp) {
     const date = new Date(timestamp);
     const year = date.getFullYear();
@@ -37,7 +37,7 @@ function FileManagement() {
     const [totalPrice, setTotalPrice] = useState(0);
     const [balance, setBalance] = useState(null);
     const [userBalanceRef, setUserBalanceRef] = useState(null);
-    const [loading, setLoading] = useState(false); // Loading state
+    const [loading, setLoading] = useState(false);
 
     const user = auth.currentUser;
 
@@ -48,6 +48,7 @@ function FileManagement() {
         Short: 1,
     };
 
+    // Fetch user data and balance
     useEffect(() => {
         if (user) {
             const userDataRef = firebase.database().ref(`userData/${user.uid}`);
@@ -62,6 +63,7 @@ function FileManagement() {
         }
     }, [user]);
 
+    // Calculate total price based on selections and number of pages
     useEffect(() => {
         const colorPrice = priceMap[color] || 0;
         const sizePrice = priceMap[size] || 0;
@@ -69,10 +71,12 @@ function FileManagement() {
         setTotalPrice(totalPrice);
     }, [color, size, numPages]);
 
+    // Validate selections (color, size, and payment method) before proceeding with the upload
     const validateSelections = () => {
         return color && size && payment;
     };
 
+    // Handle online payment
     const handleOnlinePayment = () => {
         if (payment === 'OnlinePayment' && userBalanceRef) {
             const updatedBalance = balance - totalPrice;
@@ -87,8 +91,10 @@ function FileManagement() {
         }
     };
 
-    const isPDF = (file) => file.type === "application/pdf";
+    // Check if the file is a PDF file
+    const isPDF = (file) => file && file.type === 'application/pdf';
 
+    // Upload the file
     const uploadFile = () => {
         if (fileUpload == null) return;
 
@@ -160,26 +166,41 @@ function FileManagement() {
             })
             .catch((error) => {
                 console.error("Error uploading file to storage:", error);
-
                 setLoading(false);
             });
 
         handleOnlinePayment();
     };
 
+    // Handle file change
     const onFileChange = (event) => {
         const uploadedFile = event.target.files[0];
-        setFileUpload(uploadedFile);
-        countPages(uploadedFile);
+        // Check if the uploaded file is a PDF file
+        if (uploadedFile && isPDF(uploadedFile)) {
+            setFileUpload(uploadedFile);
+            countPages(uploadedFile);
+        } else {
+            // If the file is not a PDF, show an alert and reset file state
+            alert("Please select a valid PDF file.");
+            setFileUpload(null);
+            setNumPages(null);
+            setTotalPrice(0);
+        }
     };
 
+    // Count the number of pages in the PDF file
     const countPages = async (selectedFile) => {
         const reader = new FileReader();
         reader.onload = async () => {
-            const buffer = reader.result;
-            const typedArray = new Uint8Array(buffer);
-            const pdf = await pdfjs.getDocument(typedArray).promise;
-            setNumPages(pdf.numPages);
+            try {
+                const buffer = reader.result;
+                const typedArray = new Uint8Array(buffer);
+                const pdf = await pdfjs.getDocument(typedArray).promise;
+                setNumPages(pdf.numPages);
+            } catch (error) {
+                console.error("Error processing PDF file:", error);
+                alert("An error occurred while processing the PDF file.");
+            }
         };
         reader.readAsArrayBuffer(selectedFile);
     };
