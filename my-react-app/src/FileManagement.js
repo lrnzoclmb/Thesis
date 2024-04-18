@@ -10,6 +10,8 @@ import NavBar from './NavBar';
 import { pdfjs } from 'react-pdf';
 import './filemanage.css';
 import 'typeface-montserrat';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -35,6 +37,7 @@ function FileManagement() {
     const [totalPrice, setTotalPrice] = useState(0);
     const [balance, setBalance] = useState(null);
     const [userBalanceRef, setUserBalanceRef] = useState(null);
+    const [loading, setLoading] = useState(false); // Loading state
 
     const user = auth.currentUser;
 
@@ -100,7 +103,6 @@ function FileManagement() {
         }
 
         if (payment === 'OnlinePayment') {
-
             if (balance < totalPrice) {
                 alert("Insufficient balance for online payment. Please top up your balance or choose a different payment method.");
                 return;
@@ -117,6 +119,8 @@ function FileManagement() {
         const fileRef = storageRef(storage, `files/${uuidv4()}`);
         const transactionRef = dbRef(database, 'transaction');
         const userTransactionHistoryRef = dbRef(database, `transactionHistory/${user.uid}`);
+
+        setLoading(true);
 
         uploadBytes(fileRef, fileUpload)
             .then(() => {
@@ -139,19 +143,25 @@ function FileManagement() {
                         const newTransactionID = newTransactionRef.key;
                         setQRCodeData(newTransactionID);
 
-                        console.log('File data:', fileData); 
+                        console.log('File data:', fileData);
 
                         push(userTransactionHistoryRef, fileData)
                             .catch((error) => {
                                 console.error("Error pushing data to user's transaction history:", error);
                             });
+
+                        setLoading(false);
                     })
                     .catch((error) => {
                         console.error("Error fetching file URL:", error);
+
+                        setLoading(false);
                     });
             })
             .catch((error) => {
                 console.error("Error uploading file to storage:", error);
+
+                setLoading(false);
             });
 
         handleOnlinePayment();
@@ -179,7 +189,7 @@ function FileManagement() {
             <NavBar />
             <div className="file-management">
                 <h2>File Uploading</h2>
-                <input 
+                <input
                     type="file"
                     accept=".pdf"
                     id="upload"
@@ -190,7 +200,7 @@ function FileManagement() {
                 )}
                 <p>Total Price: ₱{totalPrice}</p>
                 <div className="color-mode">
-                    <h3>Color Mode: </h3>
+                    <h3>Color Mode:</h3>
                     <input
                         type="radio"
                         name="color"
@@ -209,7 +219,7 @@ function FileManagement() {
                     <label htmlFor="bnw">Black & White</label>
                 </div>
                 <div className="paper-size">
-                    <h3>Paper Size: </h3>
+                    <h3>Paper Size:</h3>
                     <input
                         type="radio"
                         name="size"
@@ -228,7 +238,7 @@ function FileManagement() {
                     <label htmlFor="short">Short</label>
                 </div>
                 <div className="payment-method">
-                    <h3>Payment Methods: </h3>
+                    <h3>Payment Methods:</h3>
                     <input
                         type="radio"
                         name="payment"
@@ -254,7 +264,21 @@ function FileManagement() {
                     />
                     <label htmlFor="insert">Insert Coin</label>
                 </div>
-                <button onClick={uploadFile}>Generate Ticket</button>
+                <button
+                    className="btn btn-primary"
+                    onClick={uploadFile}
+                    disabled={loading}
+                >
+                    {loading ? (
+                        <>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </>
+                    ) : (
+                        'Generate Ticket'
+                    )}
+                </button>
+
                 {qrCodeData && (
                     <div className="qr-code">
                         <h3>QR Code:</h3>
