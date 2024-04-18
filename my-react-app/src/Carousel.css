@@ -3,7 +3,7 @@
   height: 400px;
   width: 100%;
   max-width: 800px;
-  margin: 0 auto; /* Center the carousel */
+  margin: 30px auto 0 auto;
 }
 
 .carousel_wrapper {
@@ -104,23 +104,37 @@
   overflow-x: hidden;
 }
 
-
 @media (max-width: 768px) {
-  
   .carousel {
-      height: 300px;
+    height: 300px;
   }
-
 
   .carousel_arrow_left,
   .carousel_arrow_right {
-      width: 30px;
-      height: 30px;
-      font-size: 20px;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
   }
 
+  .card_title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel {
+    height: 200px;
+    width: 350px;
+  }
+
+  .carousel_arrow_left,
+  .carousel_arrow_right {
+    width: 25px;
+    height: 25px;
+    font-size: 18px;
+  }
 
   .card_title {
-      font-size: 20px;
+    font-size: 18px;
   }
 }

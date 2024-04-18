@@ -23,16 +23,14 @@ const Signup = () => {
         }
 
         try {
-            // Create a new user with email and password
+
             const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, pass);
             const user = userCredential.user;
 
-            // Update the user's profile with display name
             await user.updateProfile({
                 displayName: `${firstName} ${lastName}`,
             });
 
-            // Add user data to Realtime Database using the user's UID as the key
             await firebase.database().ref(`userData/${user.uid}`).set({
                 firstName: firstName,
                 lastName: lastName,
@@ -40,7 +38,6 @@ const Signup = () => {
                 balance: userBalance,
             });
 
-            // Notify the user that the account was created successfully
             alert("Account created successfully");
             navigate("/");
         } catch (error) {

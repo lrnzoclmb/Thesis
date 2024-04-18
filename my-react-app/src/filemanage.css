@@ -12,16 +12,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  
 }
 
-.file-management h2{
+.file-management h2 {
   margin-bottom: 20px;
   letter-spacing: 2px;
   font-weight: bold;
   font-size: 45px;
   color: #007bff;
 }
+
 .color-mode {
   width: 100%; 
   border-top: 1px solid #0f0f0f;
@@ -48,13 +48,14 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-.file-management button:hover{
+
+.file-management button:hover {
   background-color: #0056b3;
 }
+
 .file-management input[id="upload"] {
   margin-left: auto;
   margin-bottom: 10px;
-  
 }
 
 .color-mode h3,
@@ -113,35 +114,109 @@
   margin-left: 10px;
 }
 
+.toptext {
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+
+label {
+  font-size: 16px;
+  display: inline-block;
+}
 
 @media (max-width: 768px) {
-  .file-management {
-    padding: 15px; 
+  label {
+    font-size: 14px;
+    display: inline-block;
+    margin-right: 5px;
+  }
+  
+  .payment-method input[type="radio"],
+  .paper-size input[type="radio"],
+  .color-mode input[type="radio"] {
+    margin-bottom: 10px; 
+    margin-left: 5px;
+    transform: scale(0.9);
+  }
+
+  .payment-method input[id="insert"] {
+ 
+    margin-left: 5px;
+    transform: scale(0.9);
   }
 
   .file-management button {
-    padding: 10px 15px; 
+    padding: 10px 15px;
   }
-
+  
   .color-mode h3,
   .paper-size h3,
   .payment-method h3 {
-    font-size: 16px; 
+    font-size: 16px;
   }
 }
 
 @media (max-width: 480px) {
-  .file-management {
-    padding: 10px; 
+  label {
+    font-size: 12px;
+    display: inline-block;
+    margin-right: 3px;
+  }
+  
+  .payment-method input[type="radio"],
+  .paper-size input[type="radio"],
+  .color-mode input[type="radio"] {
+    margin-bottom: 8px;
+    margin-left: 3px;
+    transform: scale(0.8);
+  }
+
+  .payment-method input[id="insert"] {
+  
+    margin-left: 3px;
+    transform: scale(0.8);
   }
 
   .file-management button {
-    padding: 10px; 
+    padding: 8px 12px;
   }
-
+  
   .color-mode h3,
   .paper-size h3,
   .payment-method h3 {
-    font-size: 14px; 
+    font-size: 14px;
+  }
+}
+
+
+@media (max-width: 300px) {
+  label {
+    font-size: 10px;
+    display: inline-block;
+    margin-right: 2px;
+  }
+  
+  .payment-method input[type="radio"],
+  .paper-size input[type="radio"],
+  .color-mode input[type="radio"] {
+    margin-bottom: 6px; 
+    margin-left: 2px; 
+    transform: scale(0.7); 
+  }
+
+  .payment-method input[id="insert"] {
+ 
+    margin-left: 2px;
+    transform: scale(0.7); 
+  }
+
+  .file-management button {
+    padding: 6px 10px;
+  }
+  
+  .color-mode h3,
+  .paper-size h3,
+  .payment-method h3 {
+    font-size: 12px;
   }
 }

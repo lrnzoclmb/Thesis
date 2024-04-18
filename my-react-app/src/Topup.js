@@ -4,25 +4,23 @@ import { ref as dbRef, get } from 'firebase/database';
 import NavBar from './NavBar';
 import QRCode from 'react-qr-code';
 import 'typeface-montserrat';
+import './filemanage.css';
 
 function TopUp() {
     const [qrCodeData, setQRCodeData] = useState(null);
     const user = auth.currentUser;
 
-    // Function to handle top-up
     const handleTopUp = async () => {
         if (user) {
-            // Define the reference to the user's data in the Firebase database
+
             const userRef = dbRef(database, `userData/${user.uid}`);
 
-            // Fetch the user's data from the database
             try {
                 const snapshot = await get(userRef);
                 if (snapshot.exists()) {
-                    // The push key is the path of userRef, which can be determined by the user's UID
+   
                     const pushKey = user.uid;
 
-                    // Set the QR code data to be the push key
                     setQRCodeData(pushKey);
                 } else {
                     console.log('No data available for the user.');
@@ -41,6 +39,7 @@ function TopUp() {
             <div className="file-management">
                 <div className="payment-method">
                     <h2>Top Up</h2>
+                    <p className='toptext'>Generate a ticket to add balance to your account</p>
                     <button onClick={handleTopUp}>Generate Ticket</button>
                     {qrCodeData && (
                         <div className="qr-code">

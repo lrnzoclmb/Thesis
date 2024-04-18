@@ -59,6 +59,7 @@ nav .menu {
   justify-content: space-between;
   width: 2.25rem;
   height: 2rem;
+  
 }
 
 nav .menu span {
@@ -88,6 +89,8 @@ nav .menu span {
 
   nav ul.open {
       display: flex;
+      background-color: #0f172a;
+
   }
 
   nav ul li {

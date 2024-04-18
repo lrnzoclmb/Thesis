@@ -3,8 +3,8 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
 import { storage, auth, database } from './firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { ref as dbRef, push, child } from 'firebase/database';
-import { v4 } from 'uuid';
+import { ref as dbRef, push } from 'firebase/database';
+import { v4 as uuidv4 } from 'uuid';
 import QRCode from 'react-qr-code';
 import NavBar from './NavBar';
 import { pdfjs } from 'react-pdf';
@@ -13,6 +13,18 @@ import 'typeface-montserrat';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
+function formatTimestampToDateString(timestamp) {
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
 function FileManagement() {
     const [fileUpload, setFileUpload] = useState(null);
     const [color, setColor] = useState('');
@@ -20,43 +32,30 @@ function FileManagement() {
     const [payment, setPayment] = useState('');
     const [qrCodeData, setQRCodeData] = useState(null);
     const [numPages, setNumPages] = useState(null);
-    const [status] = useState('pending');
-    const [transaction] = useState('printing');
     const [totalPrice, setTotalPrice] = useState(0);
     const [balance, setBalance] = useState(null);
     const [userBalanceRef, setUserBalanceRef] = useState(null);
+
     const user = auth.currentUser;
 
     const priceMap = {
         Colored: 5,
         BnW: 1,
         Long: 2,
-        Short: 1
+        Short: 1,
     };
 
     useEffect(() => {
-        const fetchUserBalance = async () => {
-            try {
-                const userDataRef = firebase.database().ref('userData').child(user.uid);
-                const balanceRef = userDataRef.child('balance');
-                
-                setUserBalanceRef(balanceRef);
-                
-                balanceRef.once('value')
-                    .then(balanceSnapshot => {
-                        const userBalance = balanceSnapshot.val();
-                        setBalance(userBalance || 0);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching balance:', error);
-                    });
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        };
-
         if (user) {
-            fetchUserBalance();
+            const userDataRef = firebase.database().ref(`userData/${user.uid}`);
+            const balanceRef = userDataRef.child('balance');
+            
+            setUserBalanceRef(balanceRef);
+            
+            balanceRef.on('value', (snapshot) => {
+                const userBalance = snapshot.val();
+                setBalance(userBalance || 0);
+            });
         }
     }, [user]);
 
@@ -67,22 +66,25 @@ function FileManagement() {
         setTotalPrice(totalPrice);
     }, [color, size, numPages]);
 
+    const validateSelections = () => {
+        return color && size && payment;
+    };
+
     const handleOnlinePayment = () => {
         if (payment === 'OnlinePayment' && userBalanceRef) {
             const updatedBalance = balance - totalPrice;
-            
-            // Update user's balance
-            userBalanceRef.set(updatedBalance).then(() => {
-                console.log('Balance updated successfully.');
-            }).catch((error) => {
-                console.error("Error updating balance:", error);
-            });
+
+            userBalanceRef.set(updatedBalance)
+                .then(() => {
+                    console.log('Balance updated successfully.');
+                })
+                .catch((error) => {
+                    console.error('Error updating balance:', error);
+                });
         }
     };
 
-    const isPDF = (file) => {
-        return file.type === "application/pdf";
-    };
+    const isPDF = (file) => file.type === "application/pdf";
 
     const uploadFile = () => {
         if (fileUpload == null) return;
@@ -92,42 +94,65 @@ function FileManagement() {
             return;
         }
 
-        const fileRef = storageRef(storage, `files/${v4()}`);
-        const tempDatabaseRef = dbRef(database, 'transaction');
-        const userTransactionHistoryRef = child(dbRef(database, 'transactionHistory'), user.uid); // Reference to user's transaction history
+        if (!validateSelections()) {
+            alert("Please make all selections: color mode, paper size, and payment method.");
+            return;
+        }
 
-        uploadBytes(fileRef, fileUpload).then(() => {
-            getDownloadURL(fileRef).then((downloadURL) => {
-                const fileData = {
-                    name: fileUpload.name,
-                    url: downloadURL,
-                    timestamp: Date.now(),
-                    colortype: color,
-                    papersize: size,
-                    paymenttype: payment,
-                    userID: user ? user.uid : null,
-                    totalPages: numPages,
-                    transactionStatus: status,
-                    transactionType: transaction,
-                    totalPrice: totalPrice,
-                };
+        if (payment === 'OnlinePayment') {
 
-                // Push data to the `transaction` node
-                push(tempDatabaseRef, fileData).then((newRef) => {
-                    const newID = newRef.key;
-                    setQRCodeData(newID);
-                }).catch((error) => {
-                    console.error("Error pushing data to database:", error);
-                });
+            if (balance < totalPrice) {
+                alert("Insufficient balance for online payment. Please top up your balance or choose a different payment method.");
+                return;
+            }
+        }
 
-                // Push data to user's `transactionHistory` node
-                push(userTransactionHistoryRef, fileData).catch((error) => {
-                    console.error("Error pushing data to user's transaction history:", error);
-                });
+        let status = '';
+        if (payment === 'OnlinePayment') {
+            status = 'paid';
+        } else if (payment === 'TapID' || payment === 'Coin') {
+            status = 'pending';
+        }
+
+        const fileRef = storageRef(storage, `files/${uuidv4()}`);
+        const transactionRef = dbRef(database, 'transaction');
+        const userTransactionHistoryRef = dbRef(database, `transactionHistory/${user.uid}`);
+
+        uploadBytes(fileRef, fileUpload)
+            .then(() => {
+                getDownloadURL(fileRef)
+                    .then((downloadURL) => {
+                        const fileData = {
+                            name: fileUpload.name,
+                            url: downloadURL,
+                            timestamp: formatTimestampToDateString(Date.now()),
+                            colortype: color,
+                            papersize: size,
+                            paymenttype: payment,
+                            status: status,
+                            userID: user ? user.uid : null,
+                            totalPages: numPages,
+                            totalPrice: totalPrice,
+                        };
+
+                        const newTransactionRef = push(transactionRef, fileData);
+                        const newTransactionID = newTransactionRef.key;
+                        setQRCodeData(newTransactionID);
+
+                        console.log('File data:', fileData); 
+
+                        push(userTransactionHistoryRef, fileData)
+                            .catch((error) => {
+                                console.error("Error pushing data to user's transaction history:", error);
+                            });
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching file URL:", error);
+                    });
+            })
+            .catch((error) => {
+                console.error("Error uploading file to storage:", error);
             });
-        }).catch((error) => {
-            console.error("Error uploading file to storage:", error);
-        });
 
         handleOnlinePayment();
     };
@@ -206,7 +231,7 @@ function FileManagement() {
                     <h3>Payment Methods: </h3>
                     <input
                         type="radio"
-                        name="payments"
+                        name="payment"
                         value="TapID"
                         id="TapId"
                         onChange={() => setPayment('TapID')}
@@ -214,15 +239,15 @@ function FileManagement() {
                     <label htmlFor="TapId">Tap ID</label>
                     <input
                         type="radio"
-                        name="payments"
+                        name="payment"
                         value="OnlinePayment"
-                        id="Onlinepayment"
+                        id="Online"
                         onChange={() => setPayment('OnlinePayment')}
                     />
-                    <label htmlFor="Onlinepayment">Online Payment</label>
+                    <label htmlFor="Online">Online Payment</label>
                     <input
                         type="radio"
-                        name="payments"
+                        name="payment"
                         value="Coin"
                         id="insert"
                         onChange={() => setPayment('Coin')}
