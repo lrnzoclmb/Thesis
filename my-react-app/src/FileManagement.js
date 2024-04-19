@@ -14,7 +14,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-// Function to format the timestamp to a date string
+// Function to format timestamp into date string
 function formatTimestampToDateString(timestamp) {
     const date = new Date(timestamp);
     const year = date.getFullYear();
@@ -23,7 +23,6 @@ function formatTimestampToDateString(timestamp) {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
-    
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
@@ -48,14 +47,12 @@ function FileManagement() {
         Short: 1,
     };
 
-    // Fetch user data and balance
+    // Fetch user balance
     useEffect(() => {
         if (user) {
             const userDataRef = firebase.database().ref(`userData/${user.uid}`);
             const balanceRef = userDataRef.child('balance');
-            
             setUserBalanceRef(balanceRef);
-            
             balanceRef.on('value', (snapshot) => {
                 const userBalance = snapshot.val();
                 setBalance(userBalance || 0);
@@ -63,7 +60,7 @@ function FileManagement() {
         }
     }, [user]);
 
-    // Calculate total price based on selections and number of pages
+    // Calculate total price based on color and size selection, and number of pages
     useEffect(() => {
         const colorPrice = priceMap[color] || 0;
         const sizePrice = priceMap[size] || 0;
@@ -71,16 +68,15 @@ function FileManagement() {
         setTotalPrice(totalPrice);
     }, [color, size, numPages]);
 
-    // Validate selections (color, size, and payment method) before proceeding with the upload
+    // Check for valid selections
     const validateSelections = () => {
         return color && size && payment;
     };
 
-    // Handle online payment
+    // Handle online payment deduction
     const handleOnlinePayment = () => {
         if (payment === 'OnlinePayment' && userBalanceRef) {
             const updatedBalance = balance - totalPrice;
-
             userBalanceRef.set(updatedBalance)
                 .then(() => {
                     console.log('Balance updated successfully.');
@@ -91,23 +87,32 @@ function FileManagement() {
         }
     };
 
-    // Check if the file is a PDF file
+    // Check if the file is PDF
     const isPDF = (file) => file && file.type === 'application/pdf';
 
-    // Upload the file
+    // Function to handle file upload
     const uploadFile = () => {
         if (fileUpload == null) return;
 
+        // Check file type
         if (!isPDF(fileUpload)) {
             alert("Please select a PDF file.");
             return;
         }
 
+        // Validate selections (color, size, and payment method)
         if (!validateSelections()) {
             alert("Please make all selections: color mode, paper size, and payment method.");
             return;
         }
 
+        // Ensure the file has no more than 20 pages
+        if (numPages > 20) {
+            alert("The maximum number of pages allowed is 20. Please upload a file with 20 pages or fewer.");
+            return;
+        }
+
+        // Check user's balance if online payment is selected
         if (payment === 'OnlinePayment') {
             if (balance < totalPrice) {
                 alert("Insufficient balance for online payment. Please top up your balance or choose a different payment method.");
@@ -122,16 +127,21 @@ function FileManagement() {
             status = 'pending';
         }
 
+        // Generate a file reference and transaction reference
         const fileRef = storageRef(storage, `files/${uuidv4()}`);
         const transactionRef = dbRef(database, 'transaction');
         const userTransactionHistoryRef = dbRef(database, `transactionHistory/${user.uid}`);
 
+        // Set loading state to true
         setLoading(true);
 
+        // Upload the file to Firebase storage
         uploadBytes(fileRef, fileUpload)
             .then(() => {
+                // Get the file URL after upload
                 getDownloadURL(fileRef)
                     .then((downloadURL) => {
+                        // Prepare the file data
                         const fileData = {
                             name: fileUpload.name,
                             url: downloadURL,
@@ -145,22 +155,22 @@ function FileManagement() {
                             totalPrice: totalPrice,
                         };
 
+                        // Save the file data to the transaction database
                         const newTransactionRef = push(transactionRef, fileData);
                         const newTransactionID = newTransactionRef.key;
                         setQRCodeData(newTransactionID);
 
-                        console.log('File data:', fileData);
-
+                        // Save the file data to the user's transaction history
                         push(userTransactionHistoryRef, fileData)
                             .catch((error) => {
                                 console.error("Error pushing data to user's transaction history:", error);
                             });
 
+                        // Set loading state to false
                         setLoading(false);
                     })
                     .catch((error) => {
                         console.error("Error fetching file URL:", error);
-
                         setLoading(false);
                     });
             })
@@ -169,18 +179,17 @@ function FileManagement() {
                 setLoading(false);
             });
 
+        // Handle online payment deduction
         handleOnlinePayment();
     };
 
-    // Handle file change
+    // Function to handle file change
     const onFileChange = (event) => {
         const uploadedFile = event.target.files[0];
-        // Check if the uploaded file is a PDF file
         if (uploadedFile && isPDF(uploadedFile)) {
             setFileUpload(uploadedFile);
             countPages(uploadedFile);
         } else {
-            // If the file is not a PDF, show an alert and reset file state
             alert("Please select a valid PDF file.");
             setFileUpload(null);
             setNumPages(null);
@@ -188,7 +197,7 @@ function FileManagement() {
         }
     };
 
-    // Count the number of pages in the PDF file
+    // Function to count the number of pages in the PDF file
     const countPages = async (selectedFile) => {
         const reader = new FileReader();
         reader.onload = async () => {
@@ -205,17 +214,13 @@ function FileManagement() {
         reader.readAsArrayBuffer(selectedFile);
     };
 
+    // Render the file management interface
     return (
         <>
             <NavBar />
             <div className="file-management">
                 <h2>File Uploading</h2>
-                <input
-                    type="file"
-                    accept=".pdf"
-                    id="upload"
-                    onChange={onFileChange}
-                />
+                <input type="file" accept=".pdf" id="upload" onChange={onFileChange} />
                 {numPages && (
                     <p>Total Pages: {numPages}</p>
                 )}
@@ -275,7 +280,7 @@ function FileManagement() {
                         id="Online"
                         onChange={() => setPayment('OnlinePayment')}
                     />
-                    <label htmlFor="Online">Online Payment</label>
+                    <label htmlFor="Online">Pay Now</label>
                     <input
                         type="radio"
                         name="payment"
@@ -286,19 +291,28 @@ function FileManagement() {
                     <label htmlFor="insert">Insert Coin</label>
                 </div>
                 <button
-                    className="btn btn-primary"
-                    onClick={uploadFile}
-                    disabled={loading}
-                >
-                    {loading ? (
-                        <>
-                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            Loading...
-                        </>
-                    ) : (
-                        'Generate Ticket'
-                    )}
-                </button>
+    className="btn btn-primary"
+    onClick={uploadFile}
+    disabled={loading}
+>
+    {loading ? (
+        <>
+            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Loading...
+        </>
+    ) : (
+        <>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-qr-code me-2" viewBox="0 0 16 16">
+                <path d="M2 2h2v2H2z"/>
+                <path d="M6 0v6H0V0zM5 1H1v4h4zM4 12H2v2h2z"/>
+                <path d="M6 10v6H0v-6zm-5 1v4h4v-4zm11-9h2v2h-2z"/>
+                <path d="M10 0v6h6V0zm5 1v4h-4V1zM8 1V0h1v2H8v2H7V1zm0 5V4h1v2zM6 8V7h1V6h1v2h1V7h5v1h-4v1H7V8zm0 0v1H2V8H1v1H0V7h3v1zm10 1h-1V7h1zm-1 0h-1v2h2v-1h-1zm-4 0h2v1h-1v1h-1zm2 3v-1h-1v1h-1v1H9v1h3v-2zm0 0h3v1h-2v1h-1zm-4-1v1h1v-2H7v1z"/>
+                <path d="M7 12h1v3h4v1H7zm9 2v2h-3v-1h2v-1z"/>
+            </svg>
+            Generate Ticket
+        </>
+    )}
+</button>
 
                 {qrCodeData && (
                     <div className="qr-code">

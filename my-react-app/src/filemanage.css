@@ -17,11 +17,12 @@
 }
 
 .file-management h2 {
-  margin-bottom: 20px;
-  letter-spacing: 2px;
-  font-weight: bold;
-  font-size: 45px;
-  color: #007bff;
+  text-align: center;
+  color: #000000;
+  font-size: 35px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 1px;
 }
 
 .color-mode {
@@ -43,10 +44,10 @@
 .file-management button {
   padding: 10px 20px;
   font-size: 16px;
-  background-color: #007bff;
+  background-color: #4782b4;
   color: #ffffff;
   border: none;
-  border-radius: 5px;
+  border-radius: 40px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -83,7 +84,7 @@
 
 .payment-method input[id="TapId"],
 .payment-method input[id="insert"],
-.payment-method input[id="Onlinepayment"] {
+.payment-method input[id="Online"] {
   margin-right: 10px;
 }
 
@@ -222,3 +223,4 @@ label {
     font-size: 12px;
   }
 }
+

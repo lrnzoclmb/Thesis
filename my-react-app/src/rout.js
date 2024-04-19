@@ -6,6 +6,7 @@ import Homepage from './Homepage';
 import FileManagement from './FileManagement';
 import Accountpage from './Accountpage';
 import Topup from './Topup';
+import ChangePassword from './ChangePassword';
 import 'typeface-montserrat';
 
 const Rout = () => {
@@ -23,6 +24,7 @@ const Rout = () => {
       <Route path="/FileManagement" element={<FileManagement userProfile={userProfile} />}/>
       <Route path="/Topup" element={<Topup userProfile={userProfile} />}/>
       <Route path="/Accountpage" element={<Accountpage userProfile={userProfile} />} />
+      <Route path="/ChangePassword" element={<ChangePassword userProfile={userProfile} />} />
     </Routes>
   );
 };

@@ -41,6 +41,15 @@
   height: 30px;
 }
 
+.account h2 {
+  text-align: center;
+  color: #000000;
+  font-size: 35px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
 .email {
   font-size: 14px;
   margin-bottom: 10px;
@@ -53,24 +62,49 @@
   margin-top: 10px;
 }
 
+/* Container style to align items to the right */
 .button-container {
-  margin-top: 10px;
-  display: flex;
-  justify-content: flex-start;
+  display: flex; /* Enables flexbox layout */
+  justify-content: space-between; /* Distributes space between items, moving one to the left and the other to the right */
+  align-items: center;
 }
 
-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #007bff;
-  color: white;
+.button-logout {
+  padding: 8px 16px;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
+  background-color: #dc3545;
+  color: #ffffff;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s;
+  margin-left: 20px;
 }
 
-button:hover {
+.button-logout:hover {
+  background-color: #9e343e;
+}
+
+/* Add spacing between the SVG icon and text */
+.btn-change-password svg {
+  margin-right: 8px; /* Adjust the value as needed */
+}
+
+/* Optional: style for the button */
+.btn-change-password {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+/* Optional: hover effect for the button */
+.btn-change-password:hover {
   background-color: #0056b3;
 }
 
@@ -131,6 +165,11 @@ button:hover {
       padding: 15px;
       max-width: 90%;
   }
+
+  .account h2 {
+    /* Adjust the font size for smaller screens */
+    font-size: 30px;
+}
 
   .profile {
       flex-direction: column;
@@ -194,6 +233,11 @@ button:hover {
       max-width: 350px;
       margin-top: 0;
   }
+
+  .account h2 {
+    /* Adjust the font size further for very small screens */
+    font-size: 24px;
+}
 
   .profile-info {
     flex-direction: column;

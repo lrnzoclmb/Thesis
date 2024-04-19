@@ -11,25 +11,22 @@ function TopUp() {
     const user = auth.currentUser;
 
     const handleTopUp = async () => {
-        if (user) {
-
-            const userRef = dbRef(database, `userData/${user.uid}`);
-
-            try {
-                const snapshot = await get(userRef);
-                if (snapshot.exists()) {
-   
-                    const pushKey = user.uid;
-
-                    setQRCodeData(pushKey);
-                } else {
-                    console.log('No data available for the user.');
-                }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        } else {
+        if (!user) {
             console.log('No user is logged in');
+            return;
+        }
+
+        const userRef = dbRef(database, `userData/${user.uid}`);
+        try {
+            const snapshot = await get(userRef);
+            if (snapshot.exists()) {
+                const userId = user.uid;
+                setQRCodeData(userId);
+            } else {
+                console.log('No data available for the user.');
+            }
+        } catch (error) {
+            console.error('Error fetching user data:', error);
         }
     };
 
