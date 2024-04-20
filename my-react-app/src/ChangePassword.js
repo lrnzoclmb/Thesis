@@ -40,8 +40,8 @@ const ChangePassword = () => {
             // If the password update is successful
             setSuccess('Password updated successfully!');
             setError('');
-            // Optionally navigate to another page
-            navigate('/');
+
+            navigate('/Accountpage');
         } catch (error) {
             console.error('Error updating password:', error);
             setError(`Error updating password: ${error.message}`);

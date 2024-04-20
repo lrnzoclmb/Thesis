@@ -62,10 +62,9 @@
   margin-top: 10px;
 }
 
-/* Container style to align items to the right */
 .button-container {
-  display: flex; /* Enables flexbox layout */
-  justify-content: space-between; /* Distributes space between items, moving one to the left and the other to the right */
+  display: flex; 
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -84,12 +83,11 @@
   background-color: #9e343e;
 }
 
-/* Add spacing between the SVG icon and text */
+
 .btn-change-password svg {
-  margin-right: 8px; /* Adjust the value as needed */
+  margin-right: 8px; 
 }
 
-/* Optional: style for the button */
 .btn-change-password {
   padding: 8px 16px;
   border: none;
@@ -103,7 +101,6 @@
   transition: background-color 0.3s;
 }
 
-/* Optional: hover effect for the button */
 .btn-change-password:hover {
   background-color: #0056b3;
 }
@@ -167,7 +164,6 @@
   }
 
   .account h2 {
-    /* Adjust the font size for smaller screens */
     font-size: 30px;
 }
 
@@ -235,7 +231,6 @@
   }
 
   .account h2 {
-    /* Adjust the font size further for very small screens */
     font-size: 24px;
 }
 
