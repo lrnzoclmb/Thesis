@@ -224,3 +224,18 @@ label {
   }
 }
 
+.icon-button {
+  background-color: rgb(223, 33, 33); /* Set initial background color to white */
+  border: 1px solid #000000; /* Add border styling */
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex; /* Ensure the button wraps around the icon */
+  align-items: center; /* Center the icon vertically */
+  justify-content: center; /* Center the icon horizontally */
+}
+
+.icon-button.selected {
+  background-color: rgb(54, 4, 235); /* Change background color when selected */
+}
+
+
