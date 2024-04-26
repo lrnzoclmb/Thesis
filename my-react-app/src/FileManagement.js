@@ -31,6 +31,7 @@ function FileManagement() {
     const [size, setSize] = useState('');
     const [payment, setPayment] = useState('');
     const [qrCodeData, setQRCodeData] = useState(null);
+    const [qrCodeImageUrl, setQRCodeImageUrl] = useState(null); 
     const [numPages, setNumPages] = useState(null);
     const [totalPrice, setTotalPrice] = useState(0);
     const [balance, setBalance] = useState(null);
@@ -140,6 +141,7 @@ function FileManagement() {
                         const newTransactionRef = push(transactionRef, fileData);
                         const newTransactionID = newTransactionRef.key;
                         setQRCodeData(newTransactionID);
+                        setQRCodeImageUrl(`https://api.qrserver.com/v1/create-qr-code/?data=${newTransactionID}&size=150x150`);
 
                         push(userTransactionHistoryRef, fileData)
                             .catch((error) => {
@@ -188,6 +190,17 @@ function FileManagement() {
             }
         };
         reader.readAsArrayBuffer(selectedFile);
+    };
+
+    const downloadQRCode = () => {
+        if (qrCodeImageUrl) {
+            const a = document.createElement('a');
+            a.href = qrCodeImageUrl;
+            a.download = 'QR_Code.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
     };
 
     return (
@@ -290,10 +303,10 @@ function FileManagement() {
                     )}
                 </button>
 
-                {qrCodeData && (
+                {qrCodeImageUrl && (
                     <div className="qr-code">
                         <h3>QR Code:</h3>
-                        <QRCode value={qrCodeData} />
+                        <img id="qr-code-image" src={qrCodeImageUrl} alt="QR Code" onContextMenu={downloadQRCode} />
                     </div>
                 )}
             </div>
