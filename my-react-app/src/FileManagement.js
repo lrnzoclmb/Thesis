@@ -135,7 +135,7 @@ function FileManagement() {
                             userID: user ? user.uid : null,
                             totalPages: numPages,
                             totalPrice: totalPrice,
-                            transactionType: transactionType, // Set transactionType here
+                            transactionType: transactionType, 
                         };
 
                         const newTransactionRef = push(transactionRef, fileData);
