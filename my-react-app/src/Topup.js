@@ -1,10 +1,20 @@
 import React, { useState } from 'react';
 import { database, auth } from './firebase';
-import { ref as dbRef, get } from 'firebase/database';
+import { ref as dbRef, push } from 'firebase/database';
 import NavBar from './NavBar';
-import QRCode from 'react-qr-code';
 import 'typeface-montserrat';
 import './filemanage.css';
+
+function formatTimestampToDateString(timestamp) {
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
 
 function TopUp() {
     const [qrCodeImageUrl, setQRCodeImageUrl] = useState(null);
@@ -16,28 +26,27 @@ function TopUp() {
             return;
         }
 
-        const userRef = dbRef(database, `userData/${user.uid}`);
+        const userTransactionRef = dbRef(database, 'transaction');
+        const userTransactionHistoryRef = dbRef(database, `transactionHistory/${user.uid}`); 
         try {
-            const snapshot = await get(userRef);
-            if (snapshot.exists()) {
-                const userId = user.uid;
-                setQRCodeImageUrl(`https://api.qrserver.com/v1/create-qr-code/?data=${userId}&size=150x150`);
-            } else {
-                console.log('No data available for the user.');
-            }
-        } catch (error) {
-            console.error('Error fetching user data:', error);
-        }
-    };
+            const userId = user.uid;
+            const topUpData = {
+                name: 'Top Up',
+                timestamp: formatTimestampToDateString(Date.now()),
+                paymenttype: 'TopUp',
+                status: 'pending', 
+                userID: userId,
+                totalPrice: 0, 
+                transactionType: 'top-up', 
+            };
 
-    const downloadQRCode = () => {
-        if (qrCodeImageUrl) {
-            const a = document.createElement('a');
-            a.href = qrCodeImageUrl;
-            a.download = 'QR_Code.png';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            const newTransactionRef = push(userTransactionRef, topUpData);
+            const newTransactionID = newTransactionRef.key;
+            setQRCodeImageUrl(`https://api.qrserver.com/v1/create-qr-code/?data=${newTransactionID}&size=150x150`);
+
+            push(userTransactionHistoryRef, topUpData);
+        } catch (error) {
+            console.error('Error processing top-up:', error);
         }
     };
 

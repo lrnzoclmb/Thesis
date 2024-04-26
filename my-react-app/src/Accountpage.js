@@ -85,16 +85,15 @@ function Accountpage() {
                         </div>
                     </div>
                 <div className="history">
-                    <p className="history-title">File Upload History</p>
+                    <p className="history-title">Transaction History</p>
                     {transactions.length > 0 ? (
                     <div className="table-container"> { }
                         <table className="transaction-table">
                             <thead>
                                 <tr>
                                     <th>Date & Time</th>
-                                    <th>File Name</th>
-                                    <th>Pages</th>
-                                    <th>Total Price</th>
+                                    <th>Transaction Name</th>
+                                    <th>Amount</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
@@ -103,7 +102,6 @@ function Accountpage() {
                                  <tr key={index}>
                             <td>{transaction.timestamp}</td>
                             <td>{transaction.name}</td>
-                            <td>{transaction.totalPages}</td>
                             <td>₱{transaction.totalPrice}</td>
                             <td>{transaction.status}</td>
                         </tr>

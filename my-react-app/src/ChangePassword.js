@@ -16,7 +16,6 @@ const ChangePassword = () => {
     const handleChangePassword = async (event) => {
         event.preventDefault();
 
-        // Validate that the new password and confirmation password match
         if (newPassword !== confirmPassword) {
             setError('New password and confirmation password do not match.');
             return;
@@ -30,14 +29,12 @@ const ChangePassword = () => {
         }
 
         try {
-            // Reauthenticate the user
+            
             const credential = EmailAuthProvider.credential(user.email, currentPassword);
             await reauthenticateWithCredential(user, credential);
 
-            // Update the user's password
             await updatePassword(user, newPassword);
 
-            // If the password update is successful
             setSuccess('Password updated successfully!');
             setError('');
 

@@ -5,7 +5,6 @@ import { storage, auth, database } from './firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { ref as dbRef, push } from 'firebase/database';
 import { v4 as uuidv4 } from 'uuid';
-import QRCode from 'react-qr-code';
 import NavBar from './NavBar';
 import { pdfjs } from 'react-pdf';
 import './filemanage.css';
@@ -30,21 +29,14 @@ function FileManagement() {
     const [color, setColor] = useState('');
     const [size, setSize] = useState('');
     const [payment, setPayment] = useState('');
-    const [qrCodeData, setQRCodeData] = useState(null);
     const [qrCodeImageUrl, setQRCodeImageUrl] = useState(null); 
     const [numPages, setNumPages] = useState(null);
     const [totalPrice, setTotalPrice] = useState(0);
     const [balance, setBalance] = useState(null);
     const [userBalanceRef, setUserBalanceRef] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [transactionType,] = useState('printing'); // Added transactionType
     const user = auth.currentUser;
-
-    const priceMap = {
-        Colored: 5,
-        BnW: 1,
-        Long: 2,
-        Short: 1,
-    };
 
     useEffect(() => {
         if (user) {
@@ -59,6 +51,12 @@ function FileManagement() {
     }, [user]);
 
     useEffect(() => {
+        const priceMap = {
+            Colored: 5,
+            BnW: 1,
+            Long: 2,
+            Short: 1,
+        };
         const colorPrice = priceMap[color] || 0;
         const sizePrice = priceMap[size] || 0;
         const totalPrice = (colorPrice + sizePrice) * (numPages || 0);
@@ -111,7 +109,7 @@ function FileManagement() {
 
         let status = '';
         if (payment === 'OnlinePayment') {
-            status = 'paid';
+            status = 'done';
         } else if (payment === 'TapID' || payment === 'Coin') {
             status = 'pending';
         }
@@ -125,6 +123,7 @@ function FileManagement() {
             .then(() => {
                 getDownloadURL(fileRef)
                     .then((downloadURL) => {
+ 
                         const fileData = {
                             name: fileUpload.name,
                             url: downloadURL,
@@ -136,11 +135,11 @@ function FileManagement() {
                             userID: user ? user.uid : null,
                             totalPages: numPages,
                             totalPrice: totalPrice,
+                            transactionType: transactionType, // Set transactionType here
                         };
 
                         const newTransactionRef = push(transactionRef, fileData);
                         const newTransactionID = newTransactionRef.key;
-                        setQRCodeData(newTransactionID);
                         setQRCodeImageUrl(`https://api.qrserver.com/v1/create-qr-code/?data=${newTransactionID}&size=150x150`);
 
                         push(userTransactionHistoryRef, fileData)
