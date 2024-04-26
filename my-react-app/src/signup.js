@@ -11,18 +11,20 @@ const Signup = () => {
     const [pass, setPass] = useState('');
     const [confirmPass, setConfirmPass] = useState('');
     const [userBalance] = useState(0);
+    const [loading, setLoading] = useState(false); 
     const navigate = useNavigate();
 
     const submit = async (e) => {
         e.preventDefault();
 
-        // Check if password and confirm password match
+
         if (pass !== confirmPass) {
             alert("Passwords do not match!");
             return;
         }
 
         try {
+            setLoading(true); 
 
             const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, pass);
             const user = userCredential.user;
@@ -42,6 +44,8 @@ const Signup = () => {
             navigate("/");
         } catch (error) {
             alert(error);
+        } finally {
+            setLoading(false); 
         }
     };
 
@@ -96,7 +100,13 @@ const Signup = () => {
                     Already have an account? <Link to="/">Login Now</Link>
                 </p>
 
-                <button onClick={submit}>Signup</button>
+                <button onClick={submit}>
+                    {loading ? ( 
+                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    ) : (
+                        'Signup'
+                    )}
+                </button>
             </div>
         </>
     );
