@@ -36,7 +36,7 @@ function TopUp() {
                 paymenttype: 'TopUp',
                 status: 'pending', 
                 userID: userId,
-                totalPrice: 0, 
+                topupBalance: 0, 
                 transactionType: 'top-up', 
             };
 
