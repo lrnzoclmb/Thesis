@@ -33,14 +33,16 @@ function FileManagement() {
     const [numPages, setNumPages] = useState(null);
     const [totalPrice, setTotalPrice] = useState(0);
     const [balance, setBalance] = useState(null);
+    const [userBalanceRef, setUserBalanceRef] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [transactionType,] = useState('printing'); 
+    const [transactionType,] = useState('printing'); // Added transactionType
     const user = auth.currentUser;
 
     useEffect(() => {
         if (user) {
             const userDataRef = firebase.database().ref(`userData/${user.uid}`);
             const balanceRef = userDataRef.child('balance');
+            setUserBalanceRef(balanceRef);
             balanceRef.on('value', (snapshot) => {
                 const userBalance = snapshot.val();
                 setBalance(userBalance || 0);
@@ -66,11 +68,9 @@ function FileManagement() {
     };
 
     const handleOnlinePayment = () => {
-        if (payment === 'OnlinePayment' && user) {
-            const userDataRef = firebase.database().ref(`userData/${user.uid}`);
-            const balanceRef = userDataRef.child('balance');
+        if (payment === 'OnlinePayment' && userBalanceRef) {
             const updatedBalance = balance - totalPrice;
-            balanceRef.set(updatedBalance)
+            userBalanceRef.set(updatedBalance)
                 .then(() => {
                     console.log('Balance updated successfully.');
                 })
@@ -107,14 +107,22 @@ function FileManagement() {
             }
         }
 
+        let status = '';
+        if (payment === 'OnlinePayment') {
+            status = 'pending';
+        } else if (payment === 'TapID' || payment === 'Coin') {
+            status = 'pending';
+        }
+
         const fileRef = storageRef(storage, `files/${uuidv4()}`);
         const transactionRef = dbRef(database, 'transaction');
-
+    
         setLoading(true);
         uploadBytes(fileRef, fileUpload)
             .then(() => {
                 getDownloadURL(fileRef)
                     .then((downloadURL) => {
+ 
                         const fileData = {
                             name: fileUpload.name,
                             url: downloadURL,
@@ -122,22 +130,18 @@ function FileManagement() {
                             colortype: color,
                             papersize: size,
                             paymenttype: payment,
-                            status: 'pending', 
+                            status: status,
                             userID: user ? user.uid : null,
                             totalPages: numPages,
                             totalPrice: totalPrice,
                             transactionType: transactionType, 
                         };
 
-                        push(transactionRef, fileData)
-                            .then(() => {
-                                setQRCodeImageUrl(`https://api.qrserver.com/v1/create-qr-code/?data=${transactionRef.key}&size=150x150`);
-                                setLoading(false);
-                            })
-                            .catch((error) => {
-                                console.error("Error pushing data to transaction:", error);
-                                setLoading(false);
-                            });
+                        const newTransactionRef = push(transactionRef, fileData);
+                        const newTransactionID = newTransactionRef.key;
+                        setQRCodeImageUrl(`https://api.qrserver.com/v1/create-qr-code/?data=${newTransactionID}&size=150x150`);
+
+                        setLoading(false);
                     })
                     .catch((error) => {
                         console.error("Error fetching file URL:", error);
