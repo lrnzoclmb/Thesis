@@ -27,7 +27,6 @@ function TopUp() {
         }
 
         const userTransactionRef = dbRef(database, 'transaction');
-        const userTransactionHistoryRef = dbRef(database, `transactionHistory/${user.uid}`); 
         try {
             const userId = user.uid;
             const topUpData = {
@@ -43,8 +42,6 @@ function TopUp() {
             const newTransactionRef = push(userTransactionRef, topUpData);
             const newTransactionID = newTransactionRef.key;
             setQRCodeImageUrl(`https://api.qrserver.com/v1/create-qr-code/?data=${newTransactionID}&size=150x150`);
-
-            push(userTransactionHistoryRef, topUpData);
         } catch (error) {
             console.error('Error processing top-up:', error);
         }

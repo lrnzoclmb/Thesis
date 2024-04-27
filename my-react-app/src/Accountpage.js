@@ -30,8 +30,8 @@ function Accountpage() {
                     const userBalance = balanceSnapshot.val();
                     setBalance(userBalance);
 
-                    const userTransactionHistoryRef = firebase.database().ref(`transactionHistory/${user.uid}`);
-                    userTransactionHistoryRef.on('value', (snapshot) => {
+                    const userTransactionHistoryRef = firebase.database().ref(`transaction`);
+                    userTransactionHistoryRef.orderByChild('userID').equalTo(user.uid).on('value', (snapshot) => {
                         const transactionsData = snapshot.val();
                         const transactionsArray = transactionsData ? Object.values(transactionsData) : [];
                         setTransactions(transactionsArray);
