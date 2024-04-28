@@ -21,6 +21,14 @@ body {
     margin-bottom: 50px;
 }
 
+.checkbox-container {
+    margin-top: 10px;
+}
+
+.checkbox-container label {
+    margin-right: 10px; /* Adjust as needed */
+}
+
 
 .main_container_signup .header {
     width: 100%;

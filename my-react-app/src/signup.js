@@ -11,12 +11,12 @@ const Signup = () => {
     const [pass, setPass] = useState('');
     const [confirmPass, setConfirmPass] = useState('');
     const [userBalance] = useState(0);
-    const [loading, setLoading] = useState(false); 
+    const [wantRFID, setWantRFID] = useState('yes'); // State for RFID account preference
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const submit = async (e) => {
         e.preventDefault();
-
 
         if (pass !== confirmPass) {
             alert("Passwords do not match!");
@@ -24,7 +24,7 @@ const Signup = () => {
         }
 
         try {
-            setLoading(true); 
+            setLoading(true);
 
             const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, pass);
             const user = userCredential.user;
@@ -33,11 +33,13 @@ const Signup = () => {
                 displayName: `${firstName} ${lastName}`,
             });
 
+            // Modify database update logic to include RFID account preference
             await firebase.database().ref(`userData/${user.uid}`).set({
                 firstName: firstName,
                 lastName: lastName,
                 email: email,
                 balance: userBalance,
+                wantRFID: wantRFID // Include RFID preference
             });
 
             alert("Account created successfully");
@@ -45,7 +47,7 @@ const Signup = () => {
         } catch (error) {
             alert(error);
         } finally {
-            setLoading(false); 
+            setLoading(false);
         }
     };
 
@@ -95,13 +97,33 @@ const Signup = () => {
                         placeholder='Confirm Password'
                         onChange={(e) => setConfirmPass(e.target.value)}
                     />
+
                 </div>
+                <div className='checkbox-container'>
+                    <label>Do you want your student ID to have an account?</label>
+                    <input
+                        type="radio"
+                        value="yes"
+                        checked={wantRFID === 'yes'}
+                        onChange={() => setWantRFID('yes')}
+                    />
+                    <label>Yes</label>
+                    <input
+                        type="radio"
+                        value="no"
+                        checked={wantRFID === 'no'}
+                        onChange={() => setWantRFID('no')}
+                    />
+                    <label>No</label>
+                </div>
+
+
                 <p>
                     Already have an account? <Link to="/">Login Now</Link>
                 </p>
 
                 <button onClick={submit}>
-                    {loading ? ( 
+                    {loading ? (
                         <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                     ) : (
                         'Signup'
