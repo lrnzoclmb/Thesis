@@ -54,6 +54,7 @@ const Login = () => {
                         'Login'
                     )}
                 </button>
+                <p className='admin' >Access to Admin Login Page <Link to="/admin">here.</Link></p>
             </div>
         </>
     );

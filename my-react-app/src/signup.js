@@ -33,12 +33,12 @@ const Signup = () => {
                 displayName: `${firstName} ${lastName}`,
             });
 
-            // Modify database update logic to include RFID account preference
             await firebase.database().ref(`userData/${user.uid}`).set({
                 firstName: firstName,
                 lastName: lastName,
                 email: email,
                 balance: userBalance,
+                userUID: user.uid,
                 wantRFID: wantRFID // Include RFID preference
             });
 

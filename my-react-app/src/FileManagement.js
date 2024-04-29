@@ -52,10 +52,10 @@ function FileManagement() {
 
     useEffect(() => {
         const priceMap = {
-            Colored: 5,
-            BnW: 1,
-            Long: 2,
-            Short: 1,
+            colored: 5,
+            bnw: 1,
+            long: 2,
+            short: 1,
         };
         const colorPrice = priceMap[color] || 0;
         const sizePrice = priceMap[size] || 0;
@@ -211,17 +211,17 @@ function FileManagement() {
                     <input
                         type="radio"
                         name="color"
-                        value="Colored"
+                        value="colored"
                         id="colored"
-                        onChange={() => setColor('Colored')}
+                        onChange={() => setColor('colored')}
                     />
                     <label htmlFor="colored">Colored</label>
                     <input
                         type="radio"
                         name="color"
-                        value="BnW"
+                        value="bnw"
                         id="bnw"
-                        onChange={() => setColor('BnW')}
+                        onChange={() => setColor('bnw')}
                     />
                     <label htmlFor="bnw">Black & White</label>
                 </div>
@@ -231,17 +231,17 @@ function FileManagement() {
                     <input
                         type="radio"
                         name="size"
-                        value="Long"
+                        value="long"
                         id="long"
-                        onChange={() => setSize('Long')}
+                        onChange={() => setSize('long')}
                     />
                     <label htmlFor="long">Long</label>
                     <input
                         type="radio"
                         name="size"
-                        value="Short"
+                        value="short"
                         id="short"
-                        onChange={() => setSize('Short')}
+                        onChange={() => setSize('short')}
                     />
                     <label htmlFor="short">Short</label>
                 </div>
