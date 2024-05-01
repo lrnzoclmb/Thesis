@@ -3,6 +3,7 @@ import './signup.css';
 import { Link, useNavigate } from 'react-router-dom';
 import firebase from './firebase';
 import 'typeface-montserrat';
+import LandingBar from './LandingBar';
 
 const Signup = () => {
     const [firstName, setFirstName] = useState('');
@@ -11,7 +12,6 @@ const Signup = () => {
     const [pass, setPass] = useState('');
     const [confirmPass, setConfirmPass] = useState('');
     const [userBalance] = useState(0);
-    const [wantRFID, setWantRFID] = useState('yes'); // State for RFID account preference
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -39,11 +39,10 @@ const Signup = () => {
                 email: email,
                 balance: userBalance,
                 userUID: user.uid,
-                wantRFID: wantRFID // Include RFID preference
             });
 
             alert("Account created successfully");
-            navigate("/");
+            navigate("/login");
         } catch (error) {
             alert(error);
         } finally {
@@ -53,6 +52,7 @@ const Signup = () => {
 
     return (
         <>
+        <LandingBar />
             <div className='main_container_signup'>
                 <img src="/logo192.png" alt="Picture" className="logo" />
                 <div className='header'>
@@ -99,25 +99,6 @@ const Signup = () => {
                     />
 
                 </div>
-                <div className='checkbox-container'>
-                    <label>Do you want your student ID to have an account?</label>
-                    <input
-                        type="radio"
-                        value="yes"
-                        checked={wantRFID === 'yes'}
-                        onChange={() => setWantRFID('yes')}
-                    />
-                    <label>Yes</label>
-                    <input
-                        type="radio"
-                        value="no"
-                        checked={wantRFID === 'no'}
-                        onChange={() => setWantRFID('no')}
-                    />
-                    <label>No</label>
-                </div>
-
-
                 <p>
                     Already have an account? <Link to="/">Login Now</Link>
                 </p>

@@ -10,6 +10,8 @@ import ChangePassword from './ChangePassword';
 import Admin from './admin';
 import AdminPage from './AdminPage';
 import AdminUsers from './AdminUsers';
+import LandingPage from './LandingPage';
+import FileHome from './FileHome';
 import 'typeface-montserrat';
 
 const Rout = () => {
@@ -21,7 +23,9 @@ const Rout = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Login onLogin={handleLogin} />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/FileHome" element={<FileHome />} />
+      <Route path="/login" element={<Login onLogin={handleLogin} />} />
       <Route path="/admin" element={<Admin onLogin={handleLogin} />}/>
       <Route path="/signup" element={<Signup />} />
       <Route path="/Homepage" element={<Homepage />} />

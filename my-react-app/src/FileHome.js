@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
-import { storage, auth, database } from './firebase';
+import { storage, database } from './firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { ref as dbRef, push } from 'firebase/database';
 import { v4 as uuidv4 } from 'uuid';
-import NavBar from './NavBar';
+import LandingBar from './LandingBar';
 import { pdfjs } from 'react-pdf';
 import './filemanage.css';
 import 'typeface-montserrat';
@@ -24,31 +23,17 @@ function formatTimestampToDateString(timestamp) {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
-function FileManagement() {
+function FileHome() {
     const [fileUpload, setFileUpload] = useState(null);
     const [color, setColor] = useState('');
     const [size, setSize] = useState('');
-    const [payment, setPayment] = useState('');
     const [qrCodeImageUrl, setQRCodeImageUrl] = useState(null); 
     const [numPages, setNumPages] = useState(null);
     const [totalPrice, setTotalPrice] = useState(0);
-    const [balance, setBalance] = useState(null);
-    const [userBalanceRef, setUserBalanceRef] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [transactionType,] = useState('printing'); // Added transactionType
-    const user = auth.currentUser;
-
-    useEffect(() => {
-        if (user) {
-            const userDataRef = firebase.database().ref(`userData/${user.uid}`);
-            const balanceRef = userDataRef.child('balance');
-            setUserBalanceRef(balanceRef);
-            balanceRef.on('value', (snapshot) => {
-                const userBalance = snapshot.val();
-                setBalance(userBalance || 0);
-            });
-        }
-    }, [user]);
+    const [transactionType,] = useState('printing');
+    const [status] = useState('pending');
+    const [payment] = useState('TapID');
 
     useEffect(() => {
         const priceMap = {
@@ -64,20 +49,7 @@ function FileManagement() {
     }, [color, size, numPages]);
 
     const validateSelections = () => {
-        return color && size && payment;
-    };
-
-    const handleOnlinePayment = () => {
-        if (payment === 'OnlinePayment' && userBalanceRef) {
-            const updatedBalance = balance - totalPrice;
-            userBalanceRef.set(updatedBalance)
-                .then(() => {
-                    console.log('Balance updated successfully.');
-                })
-                .catch((error) => {
-                    console.error('Error updating balance:', error);
-                });
-        }
+        return color && size;
     };
 
     const isPDF = (file) => file && file.type === 'application/pdf';
@@ -100,20 +72,6 @@ function FileManagement() {
             return;
         }
 
-        if (payment === 'OnlinePayment') {
-            if (balance < totalPrice) {
-                alert("Insufficient balance for online payment. Please top up your balance or choose a different payment method.");
-                return;
-            }
-        }
-
-        let status = '';
-        if (payment === 'OnlinePayment') {
-            status = 'pending';
-        } else if (payment === 'Coin') {
-            status = 'pending';
-        }
-
         const fileRef = storageRef(storage, `files/${uuidv4()}`);
         const transactionRef = dbRef(database, 'transaction');
     
@@ -129,9 +87,8 @@ function FileManagement() {
                             timestamp: formatTimestampToDateString(Date.now()),
                             colortype: color,
                             papersize: size,
-                            paymenttype: payment,
                             status: status,
-                            userID: user ? user.uid : null,
+                            paymenttype: payment, 
                             totalPages: numPages,
                             totalPrice: totalPrice,
                             transactionType: transactionType, 
@@ -153,7 +110,6 @@ function FileManagement() {
                 setLoading(false);
             });
 
-        handleOnlinePayment();
     };
 
     const onFileChange = (event) => {
@@ -198,7 +154,7 @@ function FileManagement() {
 
     return (
         <>
-            <NavBar />
+            <LandingBar />
             <div className="file-management">
                 <h2>File Uploading</h2>
                 <input type="file" accept=".pdf" id="upload" onChange={onFileChange} />
@@ -245,25 +201,7 @@ function FileManagement() {
                     />
                     <label htmlFor="short">Short</label>
                 </div>
-                <div className="payment-method">
-                    <h3>Payment Methods:</h3>
-                    <input
-                        type="radio"
-                        name="payment"
-                        value="OnlinePayment"
-                        id="Online"
-                        onChange={() => setPayment('OnlinePayment')}
-                    />
-                    <label htmlFor="Online">Pay Now</label>
-                    <input
-                        type="radio"
-                        name="payment"
-                        value="Coin"
-                        id="insert"
-                        onChange={() => setPayment('Coin')}
-                    />
-                    <label htmlFor="insert">Insert Coin</label>
-                </div>
+                <label className='note'><strong>Note:</strong> This feature is for Adamsonian Student with ID.</label>
                 <button
                     className="btn btn-primary"
                     onClick={uploadFile}
@@ -299,4 +237,4 @@ function FileManagement() {
     );
 }
 
-export default FileManagement;
+export default FileHome;
