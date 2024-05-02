@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'firebase/compat/database';
 import { storage, database } from './firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { ref as dbRef, push } from 'firebase/database';
+import { ref as dbRef, push, set } from 'firebase/database'; // Include set for writing to rfid database
 import { v4 as uuidv4 } from 'uuid';
 import LandingBar from './LandingBar';
 import { pdfjs } from 'react-pdf';
@@ -74,13 +74,14 @@ function FileHome() {
 
         const fileRef = storageRef(storage, `files/${uuidv4()}`);
         const transactionRef = dbRef(database, 'transaction');
-    
+        const rfidRef = dbRef(database, 'rfid'); // Reference to the RFID node
+
         setLoading(true);
         uploadBytes(fileRef, fileUpload)
             .then(() => {
                 getDownloadURL(fileRef)
                     .then((downloadURL) => {
- 
+
                         const fileData = {
                             name: fileUpload.name,
                             url: downloadURL,
@@ -97,6 +98,11 @@ function FileHome() {
                         const newTransactionRef = push(transactionRef, fileData);
                         const newTransactionID = newTransactionRef.key;
                         setQRCodeImageUrl(`https://api.qrserver.com/v1/create-qr-code/?data=${newTransactionID}&size=150x150`);
+
+                        // Generate RFID
+                        const rfid = generateRFID();
+                        // Write RFID to the database
+                        set(rfidRef, rfid); // This writes RFID to the "rfid" node
 
                         setLoading(false);
                     })
@@ -150,6 +156,12 @@ function FileHome() {
             a.click();
             document.body.removeChild(a);
         }
+    };
+
+    // Function to generate RFID
+    const generateRFID = () => {
+        // Generate and return RFID here
+        return uuidv4(); // For simplicity, using uuidv4 as RFID
     };
 
     return (

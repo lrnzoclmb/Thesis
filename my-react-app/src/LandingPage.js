@@ -13,7 +13,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
   
   const handleClick = () => {
-    navigate('/Filemanagement');
+    navigate('/FileHome');
   };
 
   useEffect(() => {
