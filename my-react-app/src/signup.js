@@ -100,7 +100,7 @@ const Signup = () => {
 
                 </div>
                 <p>
-                    Already have an account? <Link to="/">Login Now</Link>
+                    Already have an account? <Link to="/login">Login Now</Link>
                 </p>
 
                 <button onClick={submit}>

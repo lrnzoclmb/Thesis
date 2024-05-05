@@ -158,10 +158,10 @@ function FileHome() {
         }
     };
 
-    // Function to generate RFID
+
     const generateRFID = () => {
-        // Generate and return RFID here
-        return uuidv4(); // For simplicity, using uuidv4 as RFID
+
+        return uuidv4();
     };
 
     return (
@@ -241,7 +241,7 @@ function FileHome() {
                 {qrCodeImageUrl && (
                     <div className="qr-code">
                         <h3>QR Code:</h3>
-                        <img id="qr-code-image" src={qrCodeImageUrl} alt="QR Code" onContextMenu={downloadQRCode} />
+                        <img id="qr-code-image" src={qrCodeImageUrl} alt="QR Code" onContextMenu={downloadQRCode} />                       
                     </div>
                 )}
             </div>

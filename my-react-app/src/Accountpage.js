@@ -34,7 +34,9 @@ function Accountpage() {
                     userTransactionHistoryRef.orderByChild('userID').equalTo(user.uid).on('value', (snapshot) => {
                         const transactionsData = snapshot.val();
                         const transactionsArray = transactionsData ? Object.values(transactionsData) : [];
-                        setTransactions(transactionsArray);
+                        // Sort transactions in reverse chronological order
+                        const sortedTransactions = transactionsArray.sort((a, b) => b.timestamp - a.timestamp).reverse();
+                        setTransactions(sortedTransactions);
                     });
                 }
             } catch (error) {

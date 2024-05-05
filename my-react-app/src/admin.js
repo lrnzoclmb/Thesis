@@ -48,7 +48,7 @@ const Admin = () => {
                         'Login'
                     )}
                 </button>
-                <p>Access to User Login <Link to="/">here.</Link></p>
+                <p>Access to User Login <Link to="/login">here.</Link></p>
             </div>
         </>
     );

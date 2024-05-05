@@ -288,10 +288,13 @@ function FileManagement() {
                     )}
                 </button>
 
+                <label className='note'><strong>Note:</strong> Save and Scan the QR code to the nearest Falcon Print kiosk.</label>
+                
                 {qrCodeImageUrl && (
                     <div className="qr-code">
                         <h3>QR Code:</h3>
                         <img id="qr-code-image" src={qrCodeImageUrl} alt="QR Code" onContextMenu={downloadQRCode} />
+                        
                     </div>
                 )}
             </div>
