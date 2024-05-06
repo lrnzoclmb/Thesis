@@ -113,8 +113,8 @@ function AdminPage() {
   };
 
   const refillInk = () => {
-    setColoredInkCount(0); // Resetting the colored ink count
-    setBwInkCount(0); // Resetting the B&W ink count
+    setColoredInkCount(0); 
+    setBwInkCount(0); 
     setLowColoredInkWarning(false);
     setLowBnWInkWarning(false);
   };
@@ -125,7 +125,6 @@ function AdminPage() {
         <div className="account">
           <h2>Transactions</h2>
           
-          {/* Display warnings for paper and ink */}
           {lowColoredInkWarning && (
             <div className="warning">
               <p>Low colored ink warning</p>

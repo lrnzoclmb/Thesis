@@ -35,7 +35,7 @@ function FileManagement() {
     const [balance, setBalance] = useState(null);
     const [userBalanceRef, setUserBalanceRef] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [transactionType,] = useState('printing'); // Added transactionType
+    const [transactionType,] = useState('printing');
     const user = auth.currentUser;
 
     useEffect(() => {
