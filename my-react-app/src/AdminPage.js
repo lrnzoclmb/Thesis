@@ -10,6 +10,11 @@ import 'typeface-montserrat';
 function AdminPage() {
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState([]);
+  const [shortPaperCount, setShortPaperCount] = useState(0);
+  const [longPaperCount, setLongPaperCount] = useState(0);
+  const [coloredInkCount, setColoredInkCount] = useState(0);
+  const [bwInkCount, setBwInkCount] = useState(0);
+
   const [lowShortPaperWarning, setLowShortPaperWarning] = useState(false);
   const [lowLongPaperWarning, setLowLongPaperWarning] = useState(false);
   const [outOfPaperShortWarning, setOutOfPaperShortWarning] = useState(false);
@@ -17,54 +22,48 @@ function AdminPage() {
   const [lowColoredInkWarning, setLowColoredInkWarning] = useState(false);
   const [lowBnWInkWarning, setLowBnWInkWarning] = useState(false);
 
+  const calculateCounts = (transactionsArray) => {
+    let shortPages = 0;
+    let longPages = 0;
+    let coloredPages = 0;
+    let bwPages = 0;
+
+    transactionsArray.forEach((transaction) => {
+      if (transaction.papersize === 'short') {
+        shortPages += transaction.totalPages || 0;
+      } else if (transaction.papersize === 'long') {
+        longPages += transaction.totalPages || 0;
+      }
+
+      if (transaction.colortype === 'colored') {
+        coloredPages += 1;
+      } else if (transaction.colortype === 'bnw') {
+        bwPages += 1;
+      }
+    });
+
+    setShortPaperCount(shortPages);
+    setLongPaperCount(longPages);
+    setColoredInkCount(coloredPages);
+    setBwInkCount(bwPages);
+
+    setLowShortPaperWarning(shortPages >= 10 && shortPages <= 19);
+    setLowLongPaperWarning(longPages >= 10 && longPages <= 19);
+    setOutOfPaperShortWarning(shortPages > 20);
+    setOutOfPaperLongWarning(longPages > 20);
+    setLowColoredInkWarning(coloredPages >= 20);
+    setLowBnWInkWarning(bwPages >= 20);
+  };
+
   const fetchTransactions = async () => {
     try {
       const transactionsRef = firebase.database().ref('transaction');
       const snapshot = await transactionsRef.once('value');
       const transactionsData = snapshot.val();
       const transactionsArray = transactionsData ? Object.values(transactionsData) : [];
+
       setTransactions(transactionsArray);
-
-      let shortPages = 0;
-      let longPages = 0;
-      let coloredPages = 0;
-      let bwPages = 0;
-
-      transactionsArray.forEach((transaction) => {
-        if (transaction.papersize === 'short') {
-          shortPages += transaction.totalPages || 0;
-        } else if (transaction.papersize === 'long') {
-          longPages += transaction.totalPages || 0;
-        }
-        if (transaction.colortype === 'colored') {
-          coloredPages++;
-        } else if (transaction.colortype === 'bnw') {
-          bwPages++; 
-        }
-      });
-
-      const shortPaperWarning = shortPages >= 40 && shortPages <= 49;
-      const longPaperWarning = longPages >= 40 && longPages <= 49;
-      const outOfShortPaper = shortPages > 50;
-      const outOfLongPaper = longPages > 50;
-
-      setLowShortPaperWarning(shortPaperWarning);
-      setLowLongPaperWarning(longPaperWarning);
-      setOutOfPaperShortWarning(outOfShortPaper);
-      setOutOfPaperLongWarning(outOfLongPaper);
-
-      if (coloredPages >= 50) {
-        setLowColoredInkWarning(true);
-      } else {
-        setLowColoredInkWarning(false);
-      }
-  
-      if (bwPages >= 50) {
-        setLowBnWInkWarning(true);
-      } else {
-        setLowBnWInkWarning(false);
-      }
-
+      calculateCounts(transactionsArray);
     } catch (error) {
       console.error('Error fetching transactions:', error);
     }
@@ -76,70 +75,102 @@ function AdminPage() {
 
   const handleLogout = () => {
     firebase.auth().signOut()
-        .then(() => {
-            navigate('/login');
-        })
-        .catch(error => {
-            console.error('Error signing out:', error);
-        });
+      .then(() => {
+        navigate('/login');
+      })
+      .catch((error) => {
+        console.error('Error signing out:', error);
+      });
   };
 
+  const refillPaper = () => {
+    const paperType = window.prompt(
+      'Are you refilling "short" or "long" paper?',
+      'short or long'
+    );
+
+    if (paperType === 'short' || 'long') {
+      const refillAmount = window.prompt('How much paper are you refilling?', 'Enter a number');
+
+      if (refillAmount !== null && !isNaN(refillAmount)) {
+        const refillValue = parseInt(refillAmount, 10);
+
+        if (refillValue > 0) {
+          if (paperType === 'short') {
+            setShortPaperCount((prev) => prev + refillValue);
+            setLowShortPaperWarning(false);
+            setOutOfPaperShortWarning(false);
+          } else if (paperType === 'long') {
+            setLongPaperCount((prev) => prev + refillValue);
+            setLowLongPaperWarning(false);
+            setOutOfPaperLongWarning(false);
+          }
+
+          console.log(`Refilled ${refillValue} ${paperType} paper.`);
+        }
+      }
+    }
+  };
+
+  const refillInk = () => {
+    setColoredInkCount(0); // Resetting the colored ink count
+    setBwInkCount(0); // Resetting the B&W ink count
+    setLowColoredInkWarning(false);
+    setLowBnWInkWarning(false);
+  };
   return (
     <>
       <AdminNavbar />
-      <div className='account-container'>
+      <div className="account-container">
         <div className="account">
           <h2>Transactions</h2>
+          
+          {/* Display warnings for paper and ink */}
           {lowColoredInkWarning && (
             <div className="warning">
-              <p>Low colored ink warning <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16" style={{ color: 'red' }}>
-                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
-              </svg></p>
+              <p>Low colored ink warning</p>
             </div>
           )}
           {lowBnWInkWarning && (
             <div className="warning">
-              <p>Low B&W ink warning <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16" style={{ color: 'red' }}>
-                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
-              </svg></p>
+              <p>Low B&W ink warning</p>
             </div>
           )}
           {lowShortPaperWarning && (
             <div className="warning">
-              <p>Low paper warning for short paper size <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16" style={{ color: 'yellow' }}>
-                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
-              </svg></p>
+              <p>Low paper warning for short paper size</p>
             </div>
           )}
           {lowLongPaperWarning && (
             <div className="warning">
-              <p>Low paper warning for long paper size <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16" style={{ color: 'yellow' }}>
-                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
-              </svg></p>
+              <p>Low paper warning for long paper size</p>
             </div>
           )}
           {outOfPaperShortWarning && (
-            <div className="warning">
-              <p>Out of short paper warning, please add paper. <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16" style={{ color: 'red' }}>
-                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
-              </svg></p>
+            <div class="warning">
+              <p>Out of short paper warning, please add paper</p>
             </div>
           )}
           {outOfPaperLongWarning && (
             <div className="warning">
-              <p>Out of long paper warning, please add paper. <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16" style={{ color: 'red' }}>
-                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
-              </svg></p>
+              <p>Out of long paper warning, please add paper</p>
             </div>
           )}
-          <div className='button-container'>
-            <button className="button-logout" onClick={handleLogout}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-box-arrow-right" viewBox="0 0 16 16">
-                <path fillRule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
-                <path fillRule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
-              </svg> Logout
+
+          {/* Buttons for logout, refill paper, and refill ink */}
+          <div className="button-container">
+            <button onClick={handleLogout} className="button-logout">
+              Logout
+            </button>
+            <button onClick={refillPaper} className="btn-change-password">
+              Refill Paper
+            </button>
+            <button onClick={refillInk} className="btn-change-password">
+              Refill Ink
             </button>
           </div>
+
+          {/* Transaction History */}
           <div className="history">
             <p className="history-title">Transaction History</p>
             {transactions.length > 0 ? (
@@ -150,10 +181,10 @@ function AdminPage() {
                       <th>Date & Time</th>
                       <th>Transaction Name</th>
                       <th>UserID</th>
-                      <th>ColorType</th>
-                      <th>PaperSize</th>
-                      <th>PaymentType</th>
-                      <th>TotalPages</th>
+                      <th>Color Type</th>
+                      <th>Paper Size</th>
+                      <th>Payment Type</th>
+                      <th>Total Pages</th>
                       <th>Amount</th>
                       <th>Status</th>
                     </tr>
@@ -168,12 +199,11 @@ function AdminPage() {
                         <td>{transaction.papersize || '-'}</td>
                         <td>{transaction.paymenttype || '-'}</td>
                         <td>{transaction.totalPages || '-'}</td>
-                        <td>
-                          {transaction.transactionType === 'top-up' ? (
-                            <>₱{transaction.topupBalance || '-'}</>
-                          ) : (
-                            <>₱{transaction.transactionType === 'printing' ? transaction.totalPrice || '-' : '-'}</>
-                          )}
+                        <td>{transaction.transactionType === 'printing'
+                          ? `₱${transaction.totalPrice}`
+                          : transaction.transactionType === 'top-up'
+                            ? `₱${transaction.topupBalance}` 
+                            : '-'}
                         </td>
                         <td>{transaction.status || '-'}</td>
                       </tr>
@@ -182,7 +212,7 @@ function AdminPage() {
                 </table>
               </div>
             ) : (
-              <p className="no-history">No transaction history available.</p>
+              <p className="no-history">No transaction history available</p>
             )}
           </div>
         </div>
