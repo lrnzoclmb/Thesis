@@ -6,7 +6,6 @@ import 'firebase/compat/database';
 import AdminNavbar from './AdminNavbar';
 import './accountpage.css';
 import 'typeface-montserrat';
-import { Link } from "react-router-dom";
 
 function AdminUsers() { 
     const [users, setUsers] = useState([]);

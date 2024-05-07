@@ -74,7 +74,7 @@ function FileHome() {
 
         const fileRef = storageRef(storage, `files/${uuidv4()}`);
         const transactionRef = dbRef(database, 'transaction');
-        const rfidRef = dbRef(database, 'rfid'); // Reference to the RFID node
+        const rfidRef = dbRef(database, 'rfid'); 
 
         setLoading(true);
         uploadBytes(fileRef, fileUpload)
@@ -98,11 +98,11 @@ function FileHome() {
                         const newTransactionRef = push(transactionRef, fileData);
                         const newTransactionID = newTransactionRef.key;
                         setQRCodeImageUrl(`https://api.qrserver.com/v1/create-qr-code/?data=${newTransactionID}&size=150x150`);
+                        window.alert("QR code generated successfully. Please scan it to start printing.");
 
-                        // Generate RFID
                         const rfid = generateRFID();
-                        // Write RFID to the database
-                        set(rfidRef, rfid); // This writes RFID to the "rfid" node
+    
+                        set(rfidRef, rfid); 
 
                         setLoading(false);
                     })
