@@ -37,6 +37,7 @@ const Signup = () => {
                 firstName: firstName,
                 lastName: lastName,
                 email: email,
+                password: pass,
                 balance: userBalance,
                 userUID: user.uid,
             });
