@@ -44,7 +44,7 @@ function TopUp() {
 
             const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${newTransactionID}&size=150x150`;
 
-            setQRCodeImageUrl(qrCodeUrl); // Set QR code URL
+            setQRCodeImageUrl(qrCodeUrl);
         } catch (error) {
             console.error('Error processing top-up:', error);
             window.alert("An error occurred while generating the QR code.");

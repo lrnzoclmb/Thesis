@@ -9,12 +9,15 @@ import 'typeface-montserrat';
 
 function AdminPage() {
   const navigate = useNavigate();
+
+  // State variables for transactions and various counts
   const [transactions, setTransactions] = useState([]);
   const [shortPaperCount, setShortPaperCount] = useState(0);
   const [longPaperCount, setLongPaperCount] = useState(0);
   const [coloredInkCount, setColoredInkCount] = useState(0);
   const [bwInkCount, setBwInkCount] = useState(0);
 
+  // State variables for warnings
   const [lowShortPaperWarning, setLowShortPaperWarning] = useState(false);
   const [lowLongPaperWarning, setLowLongPaperWarning] = useState(false);
   const [outOfPaperShortWarning, setOutOfPaperShortWarning] = useState(false);
@@ -22,6 +25,7 @@ function AdminPage() {
   const [lowColoredInkWarning, setLowColoredInkWarning] = useState(false);
   const [lowBnWInkWarning, setLowBnWInkWarning] = useState(false);
 
+  // Function to calculate counts from transactions
   const calculateCounts = (transactionsArray) => {
     let shortPages = 0;
     let longPages = 0;
@@ -47,7 +51,6 @@ function AdminPage() {
     setColoredInkCount(coloredPages);
     setBwInkCount(bwPages);
 
-    // Update warnings based on counts
     setLowShortPaperWarning(shortPages >= 10 && shortPages <= 19);
     setLowLongPaperWarning(longPages >= 10 && longPages <= 19);
     setOutOfPaperShortWarning(shortPages > 20);
@@ -57,6 +60,7 @@ function AdminPage() {
     setLowBnWInkWarning(bwPages >= 20);
   };
 
+  // Fetch transactions from Firebase
   const fetchTransactions = async () => {
     try {
       const transactionsRef = firebase.database().ref('transaction');
@@ -65,16 +69,18 @@ function AdminPage() {
       const transactionsArray = transactionsData ? Object.values(transactionsData) : [];
 
       setTransactions(transactionsArray);
-      calculateCounts(transactionsArray); // Recalculate counts when fetching transactions
+      calculateCounts(transactionsArray);
     } catch (error) {
       console.error('Error fetching transactions:', error);
     }
   };
 
+  // ComponentDidMount lifecycle equivalent
   useEffect(() => {
-    fetchTransactions(); // Fetch and calculate counts on initial load
+    fetchTransactions(); 
   }, []);
 
+  // Logout handler
   const handleLogout = () => {
     firebase.auth().signOut()
       .then(() => {
@@ -85,13 +91,14 @@ function AdminPage() {
       });
   };
 
+  // Refill paper handler
   const refillPaper = () => {
     const paperType = window.prompt(
       'Are you refilling "short" or "long" paper?',
       'short or long'
     );
 
-    if (paperType === 'short' || paperType === 'long') {
+    if (paperType === 'short' || 'long') {
       const refillAmount = window.prompt('How much paper are you refilling?', 'Enter a number');
 
       if (refillAmount !== null && !isNaN(refillAmount)) {
@@ -112,9 +119,10 @@ function AdminPage() {
     }
   };
 
+
   const refillInk = () => {
-    setColoredInkCount(0); // Reset colored ink count
-    setBwInkCount(0); // Reset B&W ink count
+    setColoredInkCount(0); 
+    setBwInkCount(0);
     setLowColoredInkWarning(false);
     setLowBnWInkWarning(false);
   };
@@ -143,17 +151,17 @@ function AdminPage() {
             </div>
           )}
           {lowLongPaperWarning && (
-            <div class="warning">
+            <div className="warning">
               <p>Low paper warning for long paper size</p>
             </div>
           )}
           {outOfPaperShortWarning && (
-            <div class="warning">
+            <div className="warning">
               <p>Out of short paper warning, please add paper</p>
             </div>
           )}
           {outOfPaperLongWarning && (
-            <div class="warning">
+            <div className="warning">
               <p>Out of long paper warning, please add paper</p>
             </div>
           )}
@@ -200,11 +208,12 @@ function AdminPage() {
                         <td>{transaction.papersize || '-'}</td>
                         <td>{transaction.paymenttype || '-'}</td>
                         <td>{transaction.totalPages || '-'}</td>
-                        <td>{transaction.transactionType === 'printing'
-                          ? `₱${transaction.totalPrice}`
-                          : transaction.transactionType === 'top-up'
-                            ? `₱${transaction.topupBalance}` 
-                            : '-'}
+                        <td>
+                          {transaction.transactionType === 'printing'
+                            ? `₱${transaction.totalPrice}`
+                            : transaction.transactionType === 'top-up'
+                              ? `₱${transaction.topupBalance}` 
+                              : '-'}
                         </td>
                         <td>{transaction.status || '-'}</td>
                       </tr>
