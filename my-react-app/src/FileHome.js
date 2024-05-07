@@ -130,7 +130,7 @@ function FileHome() {
             setTotalPrice(0);
         }
     };
-
+    
     const countPages = async (selectedFile) => {
         const reader = new FileReader();
         reader.onload = async () => {
