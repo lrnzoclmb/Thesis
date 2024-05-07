@@ -47,10 +47,12 @@ function AdminPage() {
     setColoredInkCount(coloredPages);
     setBwInkCount(bwPages);
 
+    // Update warnings based on counts
     setLowShortPaperWarning(shortPages >= 10 && shortPages <= 19);
     setLowLongPaperWarning(longPages >= 10 && longPages <= 19);
     setOutOfPaperShortWarning(shortPages > 20);
     setOutOfPaperLongWarning(longPages > 20);
+
     setLowColoredInkWarning(coloredPages >= 20);
     setLowBnWInkWarning(bwPages >= 20);
   };
@@ -63,14 +65,14 @@ function AdminPage() {
       const transactionsArray = transactionsData ? Object.values(transactionsData) : [];
 
       setTransactions(transactionsArray);
-      calculateCounts(transactionsArray);
+      calculateCounts(transactionsArray); // Recalculate counts when fetching transactions
     } catch (error) {
       console.error('Error fetching transactions:', error);
     }
   };
 
   useEffect(() => {
-    fetchTransactions();
+    fetchTransactions(); // Fetch and calculate counts on initial load
   }, []);
 
   const handleLogout = () => {
@@ -89,7 +91,7 @@ function AdminPage() {
       'short or long'
     );
 
-    if (paperType === 'short' || 'long') {
+    if (paperType === 'short' || paperType === 'long') {
       const refillAmount = window.prompt('How much paper are you refilling?', 'Enter a number');
 
       if (refillAmount !== null && !isNaN(refillAmount)) {
@@ -97,27 +99,26 @@ function AdminPage() {
 
         if (refillValue > 0) {
           if (paperType === 'short') {
-            setShortPaperCount((prev) => prev + refillValue);
+            setShortPaperCount((prev) => prev + refillValue); // Increment short paper count
             setLowShortPaperWarning(false);
             setOutOfPaperShortWarning(false);
           } else if (paperType === 'long') {
-            setLongPaperCount((prev) => prev + refillValue);
+            setLongPaperCount((prev) => prev + refillValue); // Increment long paper count
             setLowLongPaperWarning(false);
             setOutOfPaperLongWarning(false);
           }
-
-          console.log(`Refilled ${refillValue} ${paperType} paper.`);
         }
       }
     }
   };
 
   const refillInk = () => {
-    setColoredInkCount(0); // Resetting the colored ink count
-    setBwInkCount(0); // Resetting the B&W ink count
+    setColoredInkCount(0); // Reset colored ink count
+    setBwInkCount(0); // Reset B&W ink count
     setLowColoredInkWarning(false);
     setLowBnWInkWarning(false);
   };
+
   return (
     <>
       <AdminNavbar />
@@ -142,7 +143,7 @@ function AdminPage() {
             </div>
           )}
           {lowLongPaperWarning && (
-            <div className="warning">
+            <div class="warning">
               <p>Low paper warning for long paper size</p>
             </div>
           )}
@@ -152,7 +153,7 @@ function AdminPage() {
             </div>
           )}
           {outOfPaperLongWarning && (
-            <div className="warning">
+            <div class="warning">
               <p>Out of long paper warning, please add paper</p>
             </div>
           )}

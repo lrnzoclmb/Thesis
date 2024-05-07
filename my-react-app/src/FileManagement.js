@@ -140,7 +140,7 @@ function FileManagement() {
                         const newTransactionRef = push(transactionRef, fileData);
                         const newTransactionID = newTransactionRef.key;
                         setQRCodeImageUrl(`https://api.qrserver.com/v1/create-qr-code/?data=${newTransactionID}&size=150x150`);
-
+                        window.alert("QR code generated successfully. Please scan it to start printing.");
                         setLoading(false);
                     })
                     .catch((error) => {
