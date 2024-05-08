@@ -29,15 +29,17 @@ function FileManagement() {
     const [color, setColor] = useState('');
     const [size, setSize] = useState('');
     const [payment, setPayment] = useState('');
-    const [qrCodeImageUrl, setQRCodeImageUrl] = useState(null); 
+    const [qrCodeImageUrl, setQRCodeImageUrl] = useState(null);
     const [numPages, setNumPages] = useState(null);
     const [totalPrice, setTotalPrice] = useState(0);
     const [balance, setBalance] = useState(null);
     const [userBalanceRef, setUserBalanceRef] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [transactionType,] = useState('printing');
+    const [counterPage, setCounterPage] = useState(null); // New state for counterPage
+    const [transactionType] = useState('printing');
     const user = auth.currentUser;
 
+    // Get user balance
     useEffect(() => {
         if (user) {
             const userDataRef = firebase.database().ref(`userData/${user.uid}`);
@@ -50,6 +52,16 @@ function FileManagement() {
         }
     }, [user]);
 
+    // Get `counterPage`
+    useEffect(() => {
+        const counterPageRef = firebase.database().ref('counterPage/countedPage');
+        counterPageRef.on('value', (snapshot) => {
+            const pageCount = snapshot.val();
+            setCounterPage(pageCount);
+        });
+    }, []);
+
+    // Update total price based on color, size, and number of pages
     useEffect(() => {
         const priceMap = {
             colored: 5,
@@ -59,8 +71,8 @@ function FileManagement() {
         };
         const colorPrice = priceMap[color] || 0;
         const sizePrice = priceMap[size] || 0;
-        const totalPrice = (colorPrice + sizePrice) * (numPages || 0);
-        setTotalPrice(totalPrice);
+        const calculatedTotalPrice = (colorPrice + sizePrice) * (numPages || 0);
+        setTotalPrice(calculatedTotalPrice);
     }, [color, size, numPages]);
 
     const validateSelections = () => {
@@ -82,8 +94,18 @@ function FileManagement() {
 
     const isPDF = (file) => file && file.type === 'application/pdf';
 
-    const uploadFile = () => {
+    const uploadFile = async () => {
         if (fileUpload == null) return;
+
+        // Check if `counterPage` is 20 or more
+        if (counterPage >= 20) {
+            alert("Out of Paper. Cannot generate more tickets. Notifying system ad");
+            return;
+        }
+
+        if (counterPage >= 10 && counterPage <= 19) {
+            alert("Low paper warning. Please inform the administrator.");
+        }
 
         if (!isPDF(fileUpload)) {
             alert("Please select a PDF file.");
@@ -107,53 +129,43 @@ function FileManagement() {
             }
         }
 
-        let status = '';
-        if (payment === 'OnlinePayment') {
-            status = 'pending';
-        } else if (payment === 'Coin') {
-            status = 'pending';
-        }
+        let status = 'pending';
 
         const fileRef = storageRef(storage, `files/${uuidv4()}`);
         const transactionRef = dbRef(database, 'transaction');
-    
+
         setLoading(true);
-        uploadBytes(fileRef, fileUpload)
-            .then(() => {
-                getDownloadURL(fileRef)
-                    .then((downloadURL) => {
- 
-                        const fileData = {
-                            name: fileUpload.name,
-                            url: downloadURL,
-                            timestamp: formatTimestampToDateString(Date.now()),
-                            colortype: color,
-                            papersize: size,
-                            paymenttype: payment,
-                            status: status,
-                            userID: user ? user.uid : null,
-                            totalPages: numPages,
-                            totalPrice: totalPrice,
-                            transactionType: transactionType, 
-                        };
 
-                        const newTransactionRef = push(transactionRef, fileData);
-                        const newTransactionID = newTransactionRef.key;
-                        setQRCodeImageUrl(`https://api.qrserver.com/v1/create-qr-code/?data=${newTransactionID}&size=150x150`);
-                        window.alert("QR code generated successfully. Please scan it to start printing.");
-                        setLoading(false);
-                    })
-                    .catch((error) => {
-                        console.error("Error fetching file URL:", error);
-                        setLoading(false);
-                    });
-            })
-            .catch((error) => {
-                console.error("Error uploading file to storage:", error);
-                setLoading(false);
-            });
+        try {
+            await uploadBytes(fileRef, fileUpload);
+            const downloadURL = await getDownloadURL(fileRef);
 
-        handleOnlinePayment();
+            const fileData = {
+                name: fileUpload.name,
+                url: downloadURL,
+                timestamp: formatTimestampToDateString(Date.now()),
+                colortype: color,
+                papersize: size,
+                paymenttype: payment,
+                status,
+                userID: user ? user.uid : null,
+                totalPages: numPages,
+                totalPrice,
+                transactionType,
+            };
+
+            const newTransactionRef = push(transactionRef, fileData);
+            const newTransactionID = newTransactionRef.key;
+            setQRCodeImageUrl(`https://api.qrserver.com/v1/create-qr-code/?data=${newTransactionID}&size=150x150`);
+
+            window.alert("QR code generated successfully. Please scan it to start printing.");
+
+            handleOnlinePayment();
+        } catch (error) {
+            console.error("Error uploading file to storage or fetching URL:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const onFileChange = (event) => {
@@ -241,10 +253,11 @@ function FileManagement() {
                         name="size"
                         value="short"
                         id="short"
-                        onChange={() => setSize('short')}
-                    />
+                        onChange={() => setSize('short')} 
+                    /> 
                     <label htmlFor="short">Short</label>
                 </div>
+
                 <div className="payment-method">
                     <h3>Payment Methods:</h3>
                     <input
@@ -259,11 +272,12 @@ function FileManagement() {
                         type="radio"
                         name="payment"
                         value="Coin"
-                        id="insert"
+                        id="Coin"
                         onChange={() => setPayment('Coin')}
                     />
-                    <label htmlFor="insert">Insert Coin</label>
+                    <label htmlFor="Coin">Coin</label>
                 </div>
+
                 <button
                     className="btn btn-primary"
                     onClick={uploadFile}
@@ -287,7 +301,7 @@ function FileManagement() {
                         </>
                     )}
                 </button>
-                <label className='note'><strong>Note:</strong> Save and Scan the QR code to the nearest Falcon Print kiosk.</label>
+                <label className='note'><strong>Note:</strong> Save and scan the QR code to the nearest Falcon Print kiosk.</label>
                 {qrCodeImageUrl && (
                     <div className="qr-code">
                         <h3>QR Code:</h3>

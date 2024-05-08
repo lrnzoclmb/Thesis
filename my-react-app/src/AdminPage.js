@@ -7,60 +7,30 @@ import AdminNavbar from './AdminNavbar';
 import './accountpage.css';
 import 'typeface-montserrat';
 
+// Function to format a timestamp into a readable date and time string
+function formatTimestampToDateString(timestamp) {
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
 function AdminPage() {
   const navigate = useNavigate();
 
-  // State variables for transactions and various counts
+  // State variables for transactions and total page counts
   const [transactions, setTransactions] = useState([]);
-  const [shortPaperCount, setShortPaperCount] = useState(0);
-  const [longPaperCount, setLongPaperCount] = useState(0);
-  const [coloredInkCount, setColoredInkCount] = useState(0);
-  const [bwInkCount, setBwInkCount] = useState(0);
+  const [totalPrintedShort, setTotalPrintedShort] = useState(0);
+  const [totalPrintedLong, setTotalPrintedLong] = useState(0);
+  const [totalPrintedCombined, setTotalPrintedCombined] = useState(0);
+  const [lowPaperWarning, setLowPaperWarning] = useState(false);
+  const [outOfPaperWarning, setOutOfPaperWarning] = useState(false);
 
-  // State variables for warnings
-  const [lowShortPaperWarning, setLowShortPaperWarning] = useState(false);
-  const [lowLongPaperWarning, setLowLongPaperWarning] = useState(false);
-  const [outOfPaperShortWarning, setOutOfPaperShortWarning] = useState(false);
-  const [outOfPaperLongWarning, setOutOfPaperLongWarning] = useState(false);
-  const [lowColoredInkWarning, setLowColoredInkWarning] = useState(false);
-  const [lowBnWInkWarning, setLowBnWInkWarning] = useState(false);
-
-  // Function to calculate counts from transactions
-  const calculateCounts = (transactionsArray) => {
-    let shortPages = 0;
-    let longPages = 0;
-    let coloredPages = 0;
-    let bwPages = 0;
-
-    transactionsArray.forEach((transaction) => {
-      if (transaction.papersize === 'short') {
-        shortPages += transaction.totalPages || 0;
-      } else if (transaction.papersize === 'long') {
-        longPages += transaction.totalPages || 0;
-      }
-
-      if (transaction.colortype === 'colored') {
-        coloredPages += 1;
-      } else if (transaction.colortype === 'bnw') {
-        bwPages += 1;
-      }
-    });
-
-    setShortPaperCount(shortPages);
-    setLongPaperCount(longPages);
-    setColoredInkCount(coloredPages);
-    setBwInkCount(bwPages);
-
-    setLowShortPaperWarning(shortPages >= 10 && shortPages <= 19);
-    setLowLongPaperWarning(longPages >= 10 && longPages <= 19);
-    setOutOfPaperShortWarning(shortPages > 20);
-    setOutOfPaperLongWarning(longPages > 20);
-
-    setLowColoredInkWarning(coloredPages >= 20);
-    setLowBnWInkWarning(bwPages >= 20);
-  };
-
-  // Fetch transactions from Firebase
+  // Fetch transactions from Firebase and check paper levels
   const fetchTransactions = async () => {
     try {
       const transactionsRef = firebase.database().ref('transaction');
@@ -68,19 +38,96 @@ function AdminPage() {
       const transactionsData = snapshot.val();
       const transactionsArray = transactionsData ? Object.values(transactionsData) : [];
 
+      // Calculate the total printed pages for short and long paper sizes with "scanned" status
+      const totalShort = transactionsArray
+        .filter((transaction) => transaction.status === 'scanned' && transaction.papersize === 'short')
+        .reduce((acc, transaction) => acc + (transaction.totalPages || 0), 0);
+
+      const totalLong = transactionsArray
+        .filter((transaction) => transaction.status === 'scanned' && transaction.papersize === 'long')
+        .reduce((acc, transaction) => acc + (transaction.totalPages || 0), 0);
+
+      const combinedTotal = totalShort + totalLong;
+
+      // Determine if a warning message should be displayed
+      setLowPaperWarning(combinedTotal >= 10 && combinedTotal <= 19);
+      setOutOfPaperWarning(combinedTotal >= 20);
+
+      // Update state with calculated totals
       setTransactions(transactionsArray);
-      calculateCounts(transactionsArray);
+      setTotalPrintedShort(totalShort);
+      setTotalPrintedLong(totalLong);
+      setTotalPrintedCombined(combinedTotal);
+
+      // Update Firebase with the combined total
+      const counterPageRef = firebase.database().ref('counterPage/countedPage');
+      await counterPageRef.set(combinedTotal);
     } catch (error) {
       console.error('Error fetching transactions:', error);
     }
   };
 
-  // ComponentDidMount lifecycle equivalent
   useEffect(() => {
     fetchTransactions(); 
   }, []);
 
-  // Logout handler
+  // Handle paper refill and change "scanned" status to "done"
+  const handleRefillPaper = async () => {
+    try {
+      // Fetch the current combined paper count from Firebase
+      const counterPageRef = firebase.database().ref('counterPage/countedPage');
+      const snapshot = await counterPageRef.once('value');
+      const currentCombinedTotal = snapshot.val() || 0;
+  
+      // Prompt for refill amount
+      const refillAmount = window.prompt('Enter the refill paper count:', '10');
+      const refillValue = parseInt(refillAmount, 10);
+  
+      if (!isNaN(refillValue)) {
+        const newTotal = currentCombinedTotal - refillValue;
+  
+        // Ensure the new total is not negative
+        if (newTotal < 0) {
+          alert('Refill count exceeds the current paper count. Please enter a lower value.');
+        } else {
+          // Update the combined total in Firebase
+          await counterPageRef.set(newTotal);
+          setTotalPrintedCombined(newTotal);
+  
+          // Update transactions with "scanned" status to "done"
+          const transactionsRef = firebase.database().ref('transaction');
+  
+          // Re-fetch transactions to ensure keys are correct
+          const snapshot = await transactionsRef.once('value');
+          const transactionsData = snapshot.val();
+  
+          // Check if transactionsData exists and has content
+          if (transactionsData) {
+            const updates = {};
+  
+            // Loop through the object to get each key and corresponding data
+            Object.entries(transactionsData).forEach(([key, transaction]) => {
+              if (transaction.status === 'scanned') {
+                updates[`/${key}/status`] = 'done'; // Use the key to update the correct path
+              }
+            });
+  
+            await transactionsRef.update(updates); // Apply the updates to Firebase
+  
+            // Update local state with correct keys and updated status
+            setTransactions((prevTransactions) =>
+              prevTransactions.map((t) =>
+                t.status === 'scanned' ? { ...t, status: 'done' } : t
+              )
+            );
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error during paper refill or status update:', error);
+    }
+  };
+
   const handleLogout = () => {
     firebase.auth().signOut()
       .then(() => {
@@ -91,42 +138,6 @@ function AdminPage() {
       });
   };
 
-  // Refill paper handler
-  const refillPaper = () => {
-    const paperType = window.prompt(
-      'Are you refilling "short" or "long" paper?',
-      'short or long'
-    );
-
-    if (paperType === 'short' || 'long') {
-      const refillAmount = window.prompt('How much paper are you refilling?', 'Enter a number');
-
-      if (refillAmount !== null && !isNaN(refillAmount)) {
-        const refillValue = parseInt(refillAmount, 10);
-
-        if (refillValue > 0) {
-          if (paperType === 'short') {
-            setShortPaperCount((prev) => prev + refillValue); // Increment short paper count
-            setLowShortPaperWarning(false);
-            setOutOfPaperShortWarning(false);
-          } else if (paperType === 'long') {
-            setLongPaperCount((prev) => prev + refillValue); // Increment long paper count
-            setLowLongPaperWarning(false);
-            setOutOfPaperLongWarning(false);
-          }
-        }
-      }
-    }
-  };
-
-
-  const refillInk = () => {
-    setColoredInkCount(0); 
-    setBwInkCount(0);
-    setLowColoredInkWarning(false);
-    setLowBnWInkWarning(false);
-  };
-
   return (
     <>
       <AdminNavbar />
@@ -134,49 +145,33 @@ function AdminPage() {
         <div className="account">
           <h2>Transactions</h2>
           
-          {/* Display warnings for paper and ink */}
-          {lowColoredInkWarning && (
-            <div className="warning">
-              <p>Low colored ink warning</p>
-            </div>
-          )}
-          {lowBnWInkWarning && (
-            <div className="warning">
-              <p>Low B&W ink warning</p>
-            </div>
-          )}
-          {lowShortPaperWarning && (
-            <div className="warning">
-              <p>Low paper warning for short paper size</p>
-            </div>
-          )}
-          {lowLongPaperWarning && (
-            <div className="warning">
-              <p>Low paper warning for long paper size</p>
-            </div>
-          )}
-          {outOfPaperShortWarning && (
-            <div className="warning">
-              <p>Out of short paper warning, please add paper</p>
-            </div>
-          )}
-          {outOfPaperLongWarning && (
-            <div className="warning">
-              <p>Out of long paper warning, please add paper</p>
-            </div>
-          )}
-
-          {/* Buttons for logout, refill paper, and refill ink */}
+          {/* Buttons to log out and refill paper */}
           <div className="button-container">
             <button onClick={handleLogout} className="button-logout">
               Logout
             </button>
-            <button onClick={refillPaper} className="btn-change-password">
+            <button onClick={handleRefillPaper} className="button-refill-paper">
               Refill Paper
             </button>
-            <button onClick={refillInk} className="btn-change-password">
-              Refill Ink
-            </button>
+          </div>
+
+          {/* Display paper warnings if needed */}
+          {lowPaperWarning && (
+            <div className="warning">
+              <p>Low paper warning. {formatTimestampToDateString(Date.now())}</p>
+            </div>
+          )}
+          {outOfPaperWarning && (
+            <div classfim="warning">
+              <p>Out of paper warning. {formatTimestampToDateString(Date.now())}</p>
+            </div>
+          )}
+
+          {/* Display total printed pages for short and long paper sizes */}
+          <div className="printed-page-summary">
+            <p>Total Printed Short Paper: {totalPrintedShort}</p>
+            <p>Total Printed Long Paper: {totalPrintedLong}</p>
+            <p>Total Printed Pages: {totalPrintedCombined}</p>
           </div>
 
           {/* Transaction History */}
@@ -198,10 +193,10 @@ function AdminPage() {
                       <th>Status</th>
                     </tr>
                   </thead>
-                  <tbody>
+
                     {transactions.slice().reverse().map((transaction, index) => (
                       <tr key={index}>
-                        <td>{transaction.timestamp || '-'}</td>
+                        <td>{formatTimestampToDateString(transaction.timestamp) || '-'}</td>
                         <td>{transaction.name || '-'}</td>
                         <td>{transaction.userID || '-'}</td>
                         <td>{transaction.colortype || '-'}</td>
@@ -218,11 +213,10 @@ function AdminPage() {
                         <td>{transaction.status || '-'}</td>
                       </tr>
                     ))}
-                  </tbody>
                 </table>
               </div>
             ) : (
-              <p className="no-history">No transaction history available</p>
+              <p className="no-history">No transaction history available.</p>
             )}
           </div>
         </div>
